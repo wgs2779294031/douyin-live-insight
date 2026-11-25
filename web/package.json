@@ -1,0 +1,21 @@
+{
+  "name": "assist-board-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "直播辅助看板 Web 前端（实时/复盘/设置/主播管理）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "puppeteer-core": "^25.16.0",
+    "vite": "^6.0.7"
+  }
+}

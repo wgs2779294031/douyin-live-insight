@@ -1,0 +1,86 @@
+{
+  "source": {
+    "platform": "douyin_reverse"
+  },
+  "web_rid": "",
+  "output_dir": "data",
+  "heartbeat_interval": 30,
+  "sign_backend": "auto",
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0",
+  "api_base": "https://live.douyin.com",
+  "www_base": "https://www.douyin.com",
+  "wss_host": "webcast100-ws-web-lq.douyin.com",
+  "cookie": "",
+  "max_rooms": 5,
+  "rooms": [],
+  "cold_window_seconds": 60,
+  "cold_mode": "adaptive",
+  "cold_enter_threshold": 3,
+  "cold_exit_threshold": 6,
+  "adaptive_baseline_minutes": 5,
+  "adaptive_min_samples": 3,
+  "activity_window_minutes": 10,
+  "gift_weight": 2.0,
+  "active_top_n": 10,
+  "snapshot_interval_seconds": 60,
+  "top_words_n": 20,
+  "recent_danmaku_maxlen": 200,
+  "stopwords_file": "",
+  "llm": {
+    "enabled": false,
+    "active_provider": "doubao",
+    "providers": {
+      "doubao": {
+        "api_key": "",
+        "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+        "model": "doubao-seed-2-1-turbo-260628"
+      },
+      "deepseek": {
+        "api_key": "",
+        "base_url": "https://api.deepseek.com",
+        "model": "deepseek-chat"
+      }
+    },
+    "timeout_seconds": 30,
+    "coldline_timeout_seconds": 5,
+    "probe_timeout_seconds": 5,
+    "portrait_interval_seconds": 60,
+    "coldline_enabled": true,
+    "coldline_min_interval_seconds": 120,
+    "recommend_enabled": false,
+    "products_file": "",
+    "metrics_enabled": true,
+    "provider_probe_interval_seconds": 1800,
+    "provider_failover_threshold": 2,
+    "provider_fail_count_reset_seconds": 1800,
+    "portrait_min_danmaku": 1,
+    "daily_token_budget": 1600000
+  },
+  "anchor": {
+    "enabled": false,
+    "profile_dir": "anchor_profiles.example"
+  },
+  "feishu": {
+    "enabled": false,
+    "backend": "dry_run",
+    "webhook_url": "",
+    "bearer_token": "",
+    "app_id": "",
+    "app_secret": "",
+    "alert_chat_id": "",
+    "app_token": "",
+    "table_id": "",
+    "table_id_map": {},
+    "api_base": "https://open.feishu.cn",
+    "token_refresh_margin_seconds": 300,
+    "output_dir": "data",
+    "timeout_seconds": 5,
+    "max_retries": 2,
+    "retry_backoff_seconds": 1.5,
+    "min_interval_seconds": 300,
+    "snapshot_interval_seconds": 60,
+    "queue_maxsize": 200,
+    "top_words_n": 10,
+    "active_top_n": 5
+  }
+}

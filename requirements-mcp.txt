@@ -1,0 +1,2 @@
+# Optional customer-local read-only stdio adapter; install in a separate env.
+mcp==2.3.0

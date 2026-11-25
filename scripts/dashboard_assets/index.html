@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>直播观众画像实时看板</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --border:#e4e7ec; --text:#1f2937;
+    --muted:#6b7280; --faint:#9ca3af;
+    --accent:#0e7490; --accent-weak:#ecfeff; --accent-border:#a5d8e0;
+    --pos:#16a34a; --neu:#94a3b8; --neg:#dc2626;
+    --amber:#b45309; --amber-bg:#fffbeb; --red-bg:#fef2f2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;
+    font-size:14px; line-height:1.5;
+  }
+  /* ---------- 连接中断条 ---------- */
+  #conn-banner{
+    display:none; background:#b91c1c; color:#fff; text-align:center;
+    padding:5px 12px; font-size:13px; letter-spacing:.5px;
+  }
+  #conn-banner.show{display:block;}
+  /* ---------- 顶栏 ---------- */
+  header{
+    background:var(--card); border-bottom:1px solid var(--border);
+    padding:9px 14px; display:flex; align-items:center; gap:12px;
+    flex-wrap:wrap; position:sticky; top:0; z-index:10;
+  }
+  header h1{font-size:16px; font-weight:600; white-space:nowrap;}
+  .meta-group{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .meta-item{font-size:13px; color:var(--muted); white-space:nowrap;}
+  .meta-item b{color:var(--text); font-weight:600;}
+  .status-dot{display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:#c3c8cf; margin-right:6px; vertical-align:middle;}
+  .status-dot.live{background:var(--pos); box-shadow:0 0 0 3px rgba(22,163,74,.15);}
+  .status-text.live{color:var(--pos);}
+  .spacer{flex:1;}
+  .llm-chip{
+    border:1px solid var(--border); border-radius:6px; padding:4px 10px;
+    font-size:12.5px; color:var(--muted); background:#fafbfc; white-space:nowrap;
+  }
+  .llm-chip b{color:var(--text);}
+  .llm-chip .cost{color:var(--accent); font-weight:600;}
+  .mask-toggle{display:flex; align-items:center; gap:6px; font-size:13px;
+    color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap;}
+  .mask-toggle input{cursor:pointer;}
+  /* ---------- 布局 ---------- */
+  main{
+    display:grid; grid-template-columns:minmax(560px,1.42fr) minmax(430px,1fr);
+    gap:14px; padding:14px 18px 24px; align-items:start;
+  }
+  .col{display:flex; flex-direction:column; gap:14px; min-width:0;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px;
+  }
+  .card h2{
+    font-size:14.5px; font-weight:600; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card h2 .sub{font-size:12px; font-weight:400; color:var(--faint);}
+  .empty-hint{color:var(--faint); font-size:13.5px; padding:26px 4px; text-align:center;}
+  /* ---------- 画像卡 ---------- */
+  .portrait-empty{padding:30px 4px; text-align:center; color:var(--faint); font-size:14px;}
+  .p-row{margin-bottom:12px;}
+  .p-label{font-size:12.5px; color:var(--muted); margin-bottom:5px;}
+  .tag-list{display:flex; flex-wrap:wrap; gap:6px;}
+  .tag{background:var(--accent-weak); border:1px solid var(--accent-border);
+    color:var(--accent); border-radius:4px; padding:2px 9px; font-size:12.5px;}
+  .lvl{display:inline-block; border-radius:4px; padding:2px 10px; font-size:12.5px; font-weight:600;}
+  .lvl-low{background:#f3f4f6; color:#6b7280; border:1px solid #e5e7eb;}
+  .lvl-mid{background:var(--amber-bg); color:var(--amber); border:1px solid #fcd9a8;}
+  .lvl-high{background:var(--red-bg); color:#b91c1c; border:1px solid #f3b6b6;}
+  .intent-kw{color:var(--muted); font-size:12.5px; margin-left:8px;}
+  .sent-bar{display:flex; height:14px; border-radius:3px; overflow:hidden;
+    background:#f3f4f6; border:1px solid var(--border);}
+  .sent-pos{background:var(--pos);} .sent-neu{background:var(--neu);} .sent-neg{background:var(--neg);}
+  .sent-legend{display:flex; gap:16px; margin-top:6px; font-size:12.5px; color:var(--muted);}
+  .sent-legend i{display:inline-block; width:9px; height:9px; border-radius:2px;
+    margin-right:5px; vertical-align:middle;}
+  .sugg-list{list-style:none;}
+  .sugg-list li{position:relative; padding:4px 0 4px 18px; font-size:13.5px;}
+  .sugg-list li::before{content:""; position:absolute; left:2px; top:11px;
+    width:6px; height:6px; border-radius:50%; background:var(--accent);}
+  .layers{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .layer-col{background:#fafbfc; border:1px solid var(--border); border-radius:6px; padding:8px 10px;}
+  .layer-col .lh{font-size:12.5px; margin-bottom:6px; font-weight:600;}
+  .layer-col.high .lh{color:#b91c1c;}
+  .layer-col.mid .lh{color:var(--amber);}
+  .layer-col.low .lh{color:var(--muted);}
+  .name-chip{display:inline-block; background:#fff; border:1px solid var(--border);
+    border-radius:4px; padding:1px 7px; margin:0 5px 5px 0; font-size:12.5px;}
+  .layer-more{color:var(--faint); font-size:12px;}
+  /* ---------- 趋势图 ---------- */
+  .legend{display:flex; gap:14px; font-size:12.5px; color:var(--muted); margin-bottom:6px;}
+  .legend i{display:inline-block; width:14px; height:3px; vertical-align:middle;
+    margin-right:5px; border-radius:2px;}
+  #trend-wrap{position:relative;}
+  #trend-canvas{width:100%; height:180px; display:block;}
+  /* ---------- 救场台词 ---------- */
+  #coldline-card{border-left:4px solid var(--accent);}
+  .hero-meta{font-size:12.5px; color:var(--muted); margin-bottom:8px;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .chip{background:#f3f4f6; border-radius:4px; padding:1px 8px; font-size:12px; color:#374151;}
+  .chip.anchor{background:var(--accent-weak); color:var(--accent);}
+  .hero-lines{display:flex; flex-direction:column; gap:8px;}
+  .hero-line{
+    border:1px solid var(--accent-border); background:var(--accent-weak);
+    border-radius:6px; padding:10px 14px; font-size:17px; line-height:1.55;
+  }
+  .hist-title{margin:14px 0 8px; font-size:13px; color:var(--muted); font-weight:600;}
+  #cold-history{max-height:290px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;}
+  .hist-item{border:1px solid var(--border); border-radius:6px; padding:7px 10px; background:#fcfcfd;}
+  .hist-item .hm{font-size:12px; color:var(--faint); margin-bottom:3px; display:flex; gap:8px; flex-wrap:wrap;}
+  .hist-item .hl{font-size:13px; color:#374151;}
+  .hist-item .hl div{padding:1px 0;}
+  .hist-item .none{color:var(--faint); font-size:12.5px;}
+  /* ---------- 弹幕流 ---------- */
+  #danmu-list{max-height:380px; overflow-y:auto;}
+  .dm{display:flex; gap:8px; align-items:baseline; padding:4px 2px;
+    border-bottom:1px dashed #eef0f3; font-size:13.5px;}
+  .dm .t{margin-left:auto; color:var(--faint); font-size:11.5px; white-space:nowrap;}
+  .dm .u{color:#374151; font-weight:600; white-space:nowrap;}
+  .dm .x{color:var(--text); word-break:break-all;}
+  .dm.weak{font-size:12.5px; color:var(--faint);}
+  .dm.weak .u{color:var(--faint); font-weight:400;}
+  .dm.weak .x{color:var(--faint);}
+  .type-tag{display:inline-block; font-size:11px; border-radius:3px; padding:0 5px;
+    margin-right:2px; background:#eef0f3; color:#9ca3af;}
+  /* 细滚动条 */
+  #cold-history::-webkit-scrollbar,#danmu-list::-webkit-scrollbar{width:6px;}
+  #cold-history::-webkit-scrollbar-thumb,#danmu-list::-webkit-scrollbar-thumb{
+    background:#d6d9de; border-radius:3px;}
+  @media (max-width:1200px){
+    main{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="conn-banner">服务连接中断，正在自动重连…</div>
+
+<header>
+  <h1>直播观众画像实时看板</h1>
+  <div class="meta-group">
+    <span class="meta-item">平台 <b id="hd-platform">—</b></span>
+    <span class="meta-item">房间号 <b id="hd-room">—</b></span>
+    <span class="meta-item" id="hd-date">—</span>
+    <span class="meta-item"><span class="status-dot" id="hd-dot"></span><span class="status-text" id="hd-status">—</span></span>
+    <span class="meta-item">今日弹幕 <b id="hd-danmu">0</b> <span id="hd-danmu-sub" style="font-size:12px"></span></span>
+  </div>
+  <div class="spacer"></div>
+  <div class="llm-chip" id="hd-llm" title="LLM 调用汇总">LLM —</div>
+  <label class="mask-toggle"><input type="checkbox" id="mask-cb"> 脱敏模式</label>
+</header>
+
+<main>
+  <div class="col">
+    <section class="card" id="portrait-card">
+      <h2>最新观众画像 <span class="sub" id="pt-time"></span></h2>
+      <div id="portrait-body"><div class="empty-hint">等待数据…</div></div>
+    </section>
+    <section class="card">
+      <h2>情感趋势 <span class="sub">最近 30 个画像周期</span></h2>
+      <div class="legend">
+        <span><i style="background:#16a34a"></i>积极</span>
+        <span><i style="background:#94a3b8"></i>中性</span>
+        <span><i style="background:#dc2626"></i>消极</span>
+      </div>
+      <div id="trend-wrap">
+        <canvas id="trend-canvas"></canvas>
+        <div class="empty-hint" id="trend-empty" style="position:absolute;inset:0;display:none;">等待数据…</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card" id="coldline-card">
+      <h2>冷场救场台词 <span class="sub">场控可直接照读</span></h2>
+      <div id="coldline-body"><div class="empty-hint">等待数据…</div></div>
+    </section>
+    <section class="card">
+      <h2>实时弹幕流 <span class="sub" id="dm-sub"></span></h2>
+      <div id="danmu-list"><div class="empty-hint">等待数据…</div></div>
+    </section>
+  </div>
+</main>
+
+<script id="boot" type="application/json">{"date":"__DASHBOARD_DATE__"}</script>
+<script>
+(function(){
+  "use strict";
+  var FIXED_DATE = "";
+  try { FIXED_DATE = JSON.parse(document.getElementById("boot").textContent).date || ""; } catch(e){}
+  var POLL_MS = 3000;
+  var maskOn = localStorage.getItem("dash_mask") === "1";
+  var lastState = null;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  /* 脱敏：形如“用户+10 位以上数字”的默认昵称 -> 用户****末4位（同时覆盖“手机用户123…”） */
+  function mask(s){
+    if(!maskOn) return s == null ? "" : String(s);
+    return String(s == null ? "" : s).replace(/用户(\d{10,})/g, function(_, d){
+      return "用户****" + d.slice(-4);
+    });
+  }
+  function pad(n){ return n < 10 ? "0" + n : "" + n; }
+  function hhmmss(ts){
+    if(ts == null || isNaN(ts)) return "";
+    var d = new Date(ts * 1000);
+    return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  function pct(v, digits){
+    if(v == null || isNaN(v)) return "—";
+    return (v * 100).toFixed(digits == null ? 0 : digits) + "%";
+  }
+
+  /* ---------------- 顶栏 ---------------- */
+  function renderHeader(s){
+    $("hd-date").textContent = s.date || "—";
+    $("hd-platform").textContent = s.platform || "—";
+    $("hd-room").textContent = maskOn ? "已隐藏" : (s.room_id || "—");
+    // 任一数据文件 60 秒内有更新 => 采集中
+    var mtimes = [];
+    var dm = s.files.danmu || [];
+    for(var i=0;i<dm.length;i++){ if(dm[i] && dm[i].mtime) mtimes.push(dm[i].mtime); }
+    ["portrait","coldline","metrics"].forEach(function(k){
+      var f = s.files[k]; if(f && f.mtime) mtimes.push(f.mtime);
+    });
+    var latest = mtimes.length ? Math.max.apply(null, mtimes) : null;
+    var live = latest != null && (s.now - latest) <= 60;
+    $("hd-dot").className = "status-dot" + (live ? " live" : "");
+    var st = $("hd-status");
+    st.className = "status-text" + (live ? " live" : "");
+    st.textContent = live ? "采集中" : "无新数据";
+
+    var c = s.danmu.counts || {};
+    // v2.6.1 能力降级：capabilities[key]===false 的事件类型显示"该平台不支持"，
+    // 不显示 0；{} / 键缺失（无法判定）时按原口径显示数字
+    var caps = s.danmu.capabilities || {};
+    function capVal(key, n){ return caps[key] === false ? "该平台不支持" : (n || 0); }
+    $("hd-danmu").textContent = s.danmu.total || 0;
+    $("hd-danmu-sub").textContent =
+      "弹幕 " + capVal("danmaku", c.danmaku) + "·进场 " + capVal("enter", c.enter) +
+      "·点赞 " + capVal("like", c.like) + "·礼物 " + capVal("gift", c.gift);
+
+    var m = s.metrics || {};
+    var recorded = m.usage && m.usage.totals || {};
+    var tip = "业务指标记录 " + (recorded.metric_records == null ? "未知" : recorded.metric_records) +
+      " · SDK 尝试 " + (recorded.sdk_attempts == null ? "未知" : recorded.sdk_attempts) + "（不是 HTTP 次数或画像点）" +
+      (m.probe_count ? "\n另有探测记录 " + m.probe_count + " 条，不计业务" : "") +
+      "\n已知输入 " + (m.prompt_tokens == null ? "未知" : m.prompt_tokens) + " / 输出 " + (m.completion_tokens == null ? "未知" : m.completion_tokens) + " tokens" +
+      "\n仅已落盘指标，不是完整账单；平均延迟 " + (m.avg_latency_ms == null ? "—" : m.avg_latency_ms + " ms");
+    var chip = "LLM <b>" + esc(m.provider || "—") + "</b> · 成功率 " +
+      pct(m.success_rate, 1) + " · 已记录部分估算 <span class='cost'>" +
+      (m.usage && Array.isArray(m.usage.estimates) && m.usage.estimates.length ? m.usage.estimates.map(function(e){return esc(e.currency || "币种未知") + " " + esc(e.amount == null ? "未知" : e.amount) + (e.partial ? "（部分）" : "");}).join("；") : "无估价依据（不代表零费用）") + "</span>";
+    $("hd-llm").innerHTML = chip;
+    $("hd-llm").title = tip;
+  }
+
+  /* ---------------- 画像 ---------------- */
+  function renderPortrait(s){
+    var box = $("portrait-body");
+    var env = s.portrait.latest;
+    if(!env || !env.portrait){
+      $("pt-time").textContent = "";
+      box.innerHTML = '<div class="empty-hint">等待数据…</div>';
+      return;
+    }
+    var p = env.portrait;
+    $("pt-time").textContent = "更新于 " + hhmmss(p.portrait_ts || env.ts);
+
+    var topics = p.interest_topics || [];
+    var sugg = p.suggestions || [];
+    if(!topics.length && !sugg.length){
+      box.innerHTML = '<div class="portrait-empty">弹幕积累中，暂未形成画像</div>';
+      return;
+    }
+    var h = "";
+    // 兴趣话题
+    h += '<div class="p-row"><div class="p-label">兴趣话题</div><div class="tag-list">';
+    h += topics.length ? topics.map(function(t){return '<span class="tag">'+esc(mask(t))+'</span>';}).join("")
+                       : '<span class="layer-more">暂无</span>';
+    h += "</div></div>";
+    // 消费意向
+    var ci = p.consumption_intent || {};
+    var lvMap = {low:["低","lvl-low"], mid:["中","lvl-mid"], high:["高","lvl-high"]};
+    var lv = lvMap[ci.level] || ["—","lvl-low"];
+    h += '<div class="p-row"><div class="p-label">消费意向</div><span class="lvl '+lv[1]+'">'+lv[0]+'</span>';
+    if(ci.keywords && ci.keywords.length){
+      h += '<span class="intent-kw">关键词：' + ci.keywords.map(function(k){return esc(mask(k));}).join("、") + '</span>';
+    }
+    h += "</div>";
+    // 情感比例条
+    var se = p.sentiment || {};
+    var pos = +se.positive || 0, neu = +se.neutral || 0, neg = +se.negative || 0;
+    var sum = pos + neu + neg;
+    function w(v){ return sum ? (v / sum * 100) : 0; }
+    h += '<div class="p-row"><div class="p-label">情感分布</div><div class="sent-bar">' +
+      '<div class="sent-pos" style="width:'+w(pos)+'%"></div>' +
+      '<div class="sent-neu" style="width:'+w(neu)+'%"></div>' +
+      '<div class="sent-neg" style="width:'+w(neg)+'%"></div></div>' +
+      '<div class="sent-legend"><span><i style="background:#16a34a"></i>积极 '+pct(pos)+'</span>' +
+      '<span><i style="background:#94a3b8"></i>中性 '+pct(neu)+'</span>' +
+      '<span><i style="background:#dc2626"></i>消极 '+pct(neg)+'</span></div></div>';
+    // 主播建议
+    h += '<div class="p-row"><div class="p-label">主播建议</div>';
+    if(sugg.length){
+      h += '<ul class="sugg-list">' + sugg.map(function(t){
+        return "<li>" + esc(mask(t)) + "</li>";
+      }).join("") + "</ul>";
+    } else {
+      h += '<span class="layer-more">暂无</span>';
+    }
+    h += "</div>";
+    // 活跃分层：高层全部，中低层最多 10
+    var al = p.activity_layers || {};
+    function layer(cls, title, arr, limit){
+      arr = arr || [];
+      var shown = limit ? arr.slice(0, limit) : arr;
+      var inner = shown.length ? shown.map(function(n){return '<span class="name-chip">'+esc(mask(n))+'</span>';}).join("")
+                               : '<span class="layer-more">—</span>';
+      if(limit && arr.length > limit){
+        inner += '<span class="layer-more">等 '+arr.length+' 人</span>';
+      }
+      return '<div class="layer-col '+cls+'"><div class="lh">'+title+'（'+arr.length+'）</div>'+inner+'</div>';
+    }
+    h += '<div class="p-row" style="margin-bottom:0"><div class="p-label">活跃分层</div><div class="layers">' +
+      layer("high","高活跃", al.high, 0) + layer("mid","中活跃", al.mid, 10) +
+      layer("low","低活跃", al.low, 10) + "</div></div>";
+    box.innerHTML = h;
+  }
+
+  /* ---------------- 情感趋势（原生 canvas） ---------------- */
+  function drawTrend(series){
+    var cv = $("trend-canvas"), empty = $("trend-empty");
+    if(!series || series.length < 2){
+      empty.style.display = "block";
+      var ctx0 = cv.getContext("2d");
+      ctx0.clearRect(0,0,cv.width,cv.height);
+      return;
+    }
+    empty.style.display = "none";
+    var dpr = window.devicePixelRatio || 1;
+    var W = cv.clientWidth || 600, H = 180;
+    cv.width = W * dpr; cv.height = H * dpr;
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    var padL = 34, padR = 10, padT = 10, padB = 20;
+    var cw = W - padL - padR, ch = H - padT - padB;
+    // 横向参考线 0 / 50% / 100%
+    ctx.strokeStyle = "#eef0f3"; ctx.lineWidth = 1; ctx.fillStyle = "#9ca3af";
+    ctx.font = "11px sans-serif"; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    [1,0.5,0].forEach(function(v){
+      var y = padT + ch * (1 - v);
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+      ctx.fillText(v===1 ? "100%" : (v===0.5 ? "50%" : "0"), padL-6, y);
+    });
+    function pt(i, v){
+      var x = padL + (series.length === 1 ? cw/2 : cw * i / (series.length - 1));
+      var y = padT + ch * (1 - Math.max(0, Math.min(1, v || 0)));
+      return [x,y];
+    }
+    function line(key, color){
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+      series.forEach(function(it, i){
+        var se = it.sentiment || {};
+        var xy = pt(i, +se[key] || 0);
+        if(i === 0) ctx.moveTo(xy[0],xy[1]); else ctx.lineTo(xy[0],xy[1]);
+      });
+      ctx.stroke();
+      ctx.fillStyle = color;
+      series.forEach(function(it, i){
+        var se = it.sentiment || {};
+        var xy = pt(i, +se[key] || 0);
+        ctx.beginPath(); ctx.arc(xy[0],xy[1],2.4,0,Math.PI*2); ctx.fill();
+      });
+    }
+    line("positive","#16a34a");
+    line("neutral","#94a3b8");
+    line("negative","#dc2626");
+    // 两端时间标
+    ctx.fillStyle = "#9ca3af"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+    var t0 = series[0].portrait_ts || series[0].ts;
+    var t1 = series[series.length-1].portrait_ts || series[series.length-1].ts;
+    ctx.fillText(hhmmss(t0), padL, H-17);
+    ctx.textAlign = "right";
+    ctx.fillText(hhmmss(t1), W-padR, H-17);
+  }
+
+  /* ---------------- 冷场台词 ---------------- */
+  function coldChips(r){
+    var chips = "";
+    if(r.anchor_name) chips += '<span class="chip anchor">人设：'+esc(mask(r.anchor_name))+'</span>';
+    if(typeof r.catchphrase_hit_count === "number" && r.catchphrase_hit_count > 0){
+      chips += '<span class="chip">口头禅命中 '+r.catchphrase_hit_count+'</span>';
+    }
+    if(typeof r.forbidden_filtered_count === "number" && r.forbidden_filtered_count > 0){
+      chips += '<span class="chip">禁区过滤 '+r.forbidden_filtered_count+'</span>';
+    }
+    return chips;
+  }
+  function renderColdline(s){
+    var box = $("coldline-body");
+    var recs = (s.coldline.latest || []).slice().reverse(); // 最新在上
+    var heroIdx = -1;
+    for(var i=0;i<recs.length;i++){
+      if(recs[i].lines && recs[i].lines.length){ heroIdx = i; break; }
+    }
+    if(heroIdx < 0){ box.innerHTML = '<div class="empty-hint">等待数据…</div>'; return; }
+    var hero = recs[heroIdx];
+    var h = '<div class="hero-meta"><span>'+hhmmss(hero.ts)+'</span>' + coldChips(hero) +
+            '<span style="color:var(--faint)">最新一批 · '+hero.lines.length+' 条</span></div>';
+    h += '<div class="hero-lines">' + hero.lines.map(function(t){
+      return '<div class="hero-line">'+esc(mask(t))+'</div>';
+    }).join("") + "</div>";
+    var hist = recs.filter(function(_, idx){ return idx !== heroIdx; });
+    if(hist.length){
+      h += '<div class="hist-title">历史台词（最新在上）</div><div id="cold-history">';
+      hist.forEach(function(r){
+        h += '<div class="hist-item"><div class="hm"><span>'+hhmmss(r.ts)+'</span>'+coldChips(r);
+        if(r.lines && r.lines.length) h += '<span>'+r.lines.length+' 条</span>';
+        h += "</div>";
+        if(r.lines && r.lines.length){
+          h += '<div class="hl">' + r.lines.map(function(t){return "<div>"+esc(mask(t))+"</div>";}).join("") + "</div>";
+        } else {
+          h += '<div class="none">本批无可用台词</div>';
+        }
+        h += "</div>";
+      });
+      h += "</div>";
+    }
+    box.innerHTML = h;
+  }
+
+  /* ---------------- 弹幕流 ---------------- */
+  var TYPE_LABEL = {gift:"礼物", like:"点赞", enter:"进场"};
+  function renderDanmu(s){
+    var box = $("danmu-list");
+    var rows = (s.danmu.latest || []).slice(-30).reverse();
+    $("dm-sub").textContent = s.danmu.total ? ("今日共 "+s.danmu.total+" 条事件") : "";
+    if(!rows.length){ box.innerHTML = '<div class="empty-hint">等待数据…</div>'; return; }
+    var h = "";
+    rows.forEach(function(r){
+      var weak = r.type !== "danmaku";
+      h += '<div class="dm'+(weak?' weak':'')+'">';
+      if(weak && TYPE_LABEL[r.type]){
+        h += '<span class="type-tag">'+TYPE_LABEL[r.type]+"</span>";
+      }
+      h += '<span class="u">'+esc(mask(r.uname))+'</span>' +
+           '<span class="x">'+esc(mask(r.text))+'</span>' +
+           '<span class="t">'+hhmmss(r.ts)+'</span></div>';
+    });
+    box.innerHTML = h;
+  }
+
+  /* ---------------- 渲染与轮询 ---------------- */
+  function render(s){
+    var histBox = $("cold-history"), dmBox = $("danmu-list");
+    var sy1 = histBox ? histBox.scrollTop : 0;
+    var sy2 = dmBox ? dmBox.scrollTop : 0;
+    renderHeader(s);
+    renderPortrait(s);
+    drawTrend(s.portrait.series);
+    renderColdline(s);
+    renderDanmu(s);
+    // 保留用户在滚动列表中的阅读位置
+    var nh = $("cold-history"); if(nh) nh.scrollTop = sy1;
+    dmBox = $("danmu-list"); if(dmBox) dmBox.scrollTop = sy2;
+  }
+  function setBanner(on){ $("conn-banner").className = on ? "show" : ""; }
+
+  var inflight = false;
+  function tick(){
+    if(inflight) return;
+    inflight = true;
+    var url = "/api/state" + (FIXED_DATE ? "?date=" + encodeURIComponent(FIXED_DATE) : "");
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 10000);
+    fetch(url, {signal:ctrl.signal, cache:"no-store"})
+      .then(function(res){
+        clearTimeout(timer);
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function(s){
+        inflight = false;
+        setBanner(false);
+        lastState = s;
+        render(s);
+      })
+      .catch(function(){
+        inflight = false;
+        setBanner(true);
+      });
+  }
+
+  $("mask-cb").checked = maskOn;
+  $("mask-cb").addEventListener("change", function(){
+    maskOn = this.checked;
+    localStorage.setItem("dash_mask", maskOn ? "1" : "0");
+    if(lastState) render(lastState);
+  });
+  var rt = null;
+  window.addEventListener("resize", function(){
+    if(rt) clearTimeout(rt);
+    rt = setTimeout(function(){ if(lastState) drawTrend(lastState.portrait.series); }, 150);
+  });
+
+  tick();
+  setInterval(tick, POLL_MS);
+})();
+</script>
+</body>
+</html>

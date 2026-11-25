@@ -1,0 +1,3 @@
+# Preserve imported local-data bytes for provenance comparisons across checkouts.
+scripts/local_data/export_records.py -text
+scripts/local_data/build_index.py -text

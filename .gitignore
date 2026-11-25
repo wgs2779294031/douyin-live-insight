@@ -1,0 +1,64 @@
+# 敏感配置（含 cookie / api_key，绝不入库）
+config.json
+config.json.tmp
+config.json.*.tmp
+
+# 名册事务锁与原子写临时文件只属于本机运行状态
+/anchors.json.lock
+/anchors.json.*.tmp
+
+# 候选商品列表：真实商品文件不入库（含定价/商品机密），示例模板 products.example.json 入库
+products.json
+
+# 主播人设卡：真实人设目录整体不入库（仅 .gitkeep 例外），示例模板在 anchor_profiles.example/（入库）
+anchor_profiles/*
+!anchor_profiles/.gitkeep
+
+# 数据与日志（含采集落盘、LLM 画像/台词/推荐/metrics 落盘）
+data/
+*.log
+
+# 原始抓包可含会话、签名及用户内容；只保留本机，不随版本发布。
+/captures/
+
+# Python 虚拟环境与缓存
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# 备份文件与改前快照（含 config 密钥备份，绝不入库）
+# 涵盖 *.bak / *.v1.bak / *.v2bak / *.v41bak / *.prellm.bak / *.anchorbak / *.diff 等全部命名
+*[bB][aA][kK]
+*.diff
+
+# 编辑器/系统
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# 抖音 web 前端 JS 快照（1.4MB 第三方产物，可随时按 refs/README.md 重抓）
+# 派生结论（method 名清单）照常入库，见 refs/known_methods_web_all.json
+refs/client-entry-1.js
+
+# 移植准备（2026-10-04）：登录态浏览器 profile 与云端环境变量绝不入库
+browser-profile/
+.env.watch
+.pytest_tmp/
+
+# 前端依赖。★ web/dist 故意入库：单机部署，换机/回滚只要 git checkout，
+# 不需要装 node；代价是改前端必须 npm run build 后连同源码一起提交。
+web/node_modules/
+
+# 前端自验截图（tools/shot.mjs 的产物，每次都不一样，不入库）
+web/tools/shots/
+
+# Public development/build outputs and opt-in isolated fixtures
+.test-state/
+build/
+release/
+*.zip
+*.partial
+.pytest_cache/

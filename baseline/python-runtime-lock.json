@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "python": {
+    "version": "3.14.10",
+    "abi": "cp314",
+    "platform": "win_amd64",
+    "free_threaded": false,
+    "embeddable": {
+      "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-embeddable-amd64.zip",
+      "sha256": "b553e7dac884469b40e0740bb527271c3378f700b427e0485835f1bb6424361c",
+      "filename": "python-3.14.10-embeddable-amd64.zip",
+      "bytes": 12620338
+    },
+    "builder_archive": {
+      "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-amd64.zip",
+      "sha256": "cc28026a650970cc1570bb127312f1f9634eb67abfe157ae6ca1acbbc627d091",
+      "delivered": false,
+      "filename": "python-3.14.10-amd64.zip",
+      "bytes": 32987388
+    }
+  },
+  "wheel_lock_filename": "python-wheel-lock.json",
+  "wheel_lock_sha256": "9bcbe0560861e85dd86600f98a72cecef967123391197da0f0ba8e0f9e433e7a",
+  "requirements_filename": "requirements-python.lock.txt",
+  "requirements_sha256": "e8d494334f18051c6b8b9ced380b84982e19c10609429e016219f92bcd5dc8be",
+  "builder_python_exe_sha256": "d718435b892db4ad5b547d12fec61be7baa7faf7a58d857ea58053be24c7a000",
+  "sitecustomize_sha256": "bce490bd70874ccc4f6c72666bac5add24a9152833c3d95ccf702260dd5cb0ed",
+  "pth_lines": [
+    "python314.zip",
+    ".",
+    "Lib/site-packages",
+    "../../app",
+    "../../app/scripts",
+    "import site"
+  ],
+  "dll_directories": [
+    "runtime/python",
+    "runtime/python/Lib/site-packages/pywin32_system32",
+    "runtime/python/Lib/site-packages/numpy.libs",
+    "runtime/python/Lib/site-packages/curl_cffi.libs",
+    "runtime/python/Lib/site-packages/ctranslate2",
+    "runtime/python/Lib/site-packages/av.libs",
+    "runtime/python/Lib/site-packages/onnxruntime/capi",
+    "runtime/python/Lib/site-packages/py_mini_racer"
+  ],
+  "allowed_pth_sha256": {
+    "Lib/site-packages/pywin32.pth": "e7cd73df98b91c407dfd96d1f4dd18b7f9a60f29902b92cf5ece79b6eb637b81"
+  },
+  "reviewed_hook_sha256": {
+    "Lib/site-packages/win32/lib/pywin32_bootstrap.py": "fd31f27bc85a6b9c974670838b6eefafb32991be4a9f840f96a4f5524df3b3c3"
+  },
+  "optional_not_shipped": {
+    "zhconv": "No upstream binary wheel. Optional traditional/simplified normalization omitted; no source build.",
+    "PyExecJS": "Not in closure; only validated MiniRacer main signing backend supported."
+  },
+  "system_prerequisites": {
+    "windows": "Windows 10/11 x64; clean-host validation is separate",
+    "ct2_cpu": "x86-64 SSE4.1 minimum per upstream prebuilt hardware support",
+    "visual_cpp": "Microsoft Visual C++ v14 x64 Redistributable; no host DLL copying or system installation by this build tool"
+  },
+  "network_at_prepare": "offline only",
+  "pip_at_customer": false
+}

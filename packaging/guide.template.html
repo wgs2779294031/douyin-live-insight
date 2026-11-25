@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>直播监控本地版 · 安装与使用指南</title>
+<style>
+:root{color-scheme:light;--ink:#202d3c;--muted:#526173;--line:#d7e0e9;--blue:#185ba5}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fa;color:var(--ink);font:16px/1.85 "Microsoft YaHei","PingFang SC",sans-serif}
+main{max-width:960px;margin:32px auto;padding:36px 48px;background:white;border:1px solid var(--line);border-radius:14px}
+h1{font-size:30px;line-height:1.4;margin:0 0 12px}
+h2{font-size:23px;line-height:1.5;margin:34px 0 12px;padding-top:12px;border-top:1px solid var(--line);scroll-margin-top:20px}
+h3{font-size:18px;margin:22px 0 8px}p{margin:10px 0}li{margin:7px 0}
+a{color:var(--blue);text-underline-offset:3px}nav{display:flex;gap:8px 20px;flex-wrap:wrap;margin:20px 0}
+code{font:14px/1.65 Consolas,"Microsoft YaHei",monospace}
+p code,li code,td code{background:#eef3f8;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+.note{border-left:4px solid var(--blue);background:#eff6ff;padding:12px 16px;margin:18px 0}
+.muted{color:var(--muted);font-size:14px}.command{border:1px solid var(--line);border-radius:8px;margin:14px 0;overflow:hidden}
+.command-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;background:#edf2f7}
+.command-head strong{font-size:14px}button,select{font:inherit}
+button{font-size:14px;border:1px solid #b3c7dc;color:#174b82;background:white;border-radius:5px;padding:5px 12px;cursor:pointer}
+button:hover{background:#e5effa}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #80aee0;outline-offset:3px}
+pre{margin:0;padding:16px;background:#142333;color:#f4f8fc;white-space:pre-wrap;overflow-wrap:anywhere}
+select{padding:6px 10px;border:1px solid #aabbcc;border-radius:5px;background:white}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{background:#f0f4f8}details{border:1px solid var(--line);padding:12px 16px;border-radius:7px;margin:12px 0}
+summary{cursor:pointer;font-weight:bold}#copy-status{min-height:26px;color:var(--blue);font-size:14px}
+.path{font-weight:bold;overflow-wrap:anywhere}.done{color:#18633a}
+@media(max-width:640px){main{margin:0;padding:24px 18px;border:0;border-radius:0}h1{font-size:26px}h2{font-size:21px}.command-head{align-items:flex-start}pre{padding:12px}}
+@media print{body{background:white}main{max-width:none;margin:0;padding:0;border:0}button,nav,#copy-status{display:none}pre{color:black;background:#f2f2f2}.command,details{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body>
+<main>
+<h1>直播监控本地版<br>安装与使用指南</h1>
+<p>第一次安装，按下方顺序操作即可。系统会在自己的电脑上保存采集数据，支持弹幕和统计、录音转写，以及把资料交给自己的智能体读取。</p>
+<p class="muted">本指南随当前测试版安装包生成；请同时核对发布页的完整 ZIP SHA-256。</p>
+<nav aria-label="指南目录"><a href="#prepare">安装前准备</a><a href="#extract">解压</a><a href="#install">双击安装</a><a href="#first-run">打开看板和添加主播</a><a href="#daily">以后怎样开关</a><a href="#agent">智能体接入</a><a href="#help">遇到问题</a></nav>
+
+<h2 id="prepare">安装前准备</h2>
+<ul>
+<li>使用 Windows 10 22H2 x64，或 Windows 11 x64。在 Windows「设置 → 系统 → 关于」中查看系统版本与类型，处理器应显示为「基于 x64 的处理器」。</li>
+<li>准备系统 Edge 浏览器和 Microsoft Visual C++ v14 x64 运行库。系统还需有 .NET Framework 4.8 或兼容版本。已有这些组件时可继续下面的步骤。</li>
+<li>为下载、解压和首次安装建议预留约 8 GB 空闲磁盘空间，后续录音和资料增长需要额外空间。</li>
+<li>Python、Node 和转写模型随安装包提供。首次体验可保持内置 AI 关闭，API Key 留空也能采集、转写和读取资料。</li>
+</ul>
+<p>缺少组件时，在微软页面下载并安装。VC++ 请选择 X64，.NET 请选择 Runtime。系统出现安装权限提示时，按自己的设备权限处理。</p>
+<p><a href="https://www.microsoft.com/edge/download" target="_blank" rel="noopener">微软 Edge 下载</a> · <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170" target="_blank" rel="noopener">微软 VC++ v14 下载</a> · <a href="https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48" target="_blank" rel="noopener">微软 .NET Framework 4.8 Runtime</a></p>
+
+<h2 id="extract">先完整解压</h2>
+<ol>
+<li>在电脑上接收并保存「直播监控本地版-含安装指南.zip」。</li>
+<li>右键压缩包，选择「全部解压缩」或解压软件的「解压到」。选择一个短的本地路径，例如 <code>D:\LM-Setup</code>。只有 C 盘时可用 <code>C:\LM-Setup</code>，或自己的下载目录下的短路径。</li>
+<li>等待解压完成。打开解压后的目录，确认能同时看到这份指南、「安装直播监控.exe」和「安装文件」文件夹。</li>
+</ol>
+<div class="note">解压出整个文件夹后，从外层的「安装直播监控.exe」进入安装。让它和「安装文件」文件夹放在一起。</div>
+
+<h2 id="install">双击安装，自动创建桌面图标</h2>
+<ol>
+<li>双击解压目录里的「安装直播监控.exe」。</li>
+<li>在窗口中选择安装位置。默认优先使用 <code>D:\LiveMonitor</code>，只有 C 盘时使用当前 Windows 用户的本地应用目录。也可以选择自己的短本地路径。</li>
+<li>点「安装并创建图标」，等待窗口显示安装结果。首次安装会复制较多文件，请等它完成。</li>
+<li>成功后，桌面和开始菜单会出现「直播监控」及「停止直播监控」图标。助手会记住这次安装的位置。</li>
+</ol>
+<p>首次安装请选择新的目录，并让安装位置与解压文件夹分开。系统提示缺少运行库时，按本指南开头的官方链接补齐组件后继续。操作进行中点击窗口的关闭按钮，助手会最小化并继续等待完成。</p>
+<p>日常启动使用桌面或开始菜单图标。桌面已有同名图标时，新图标名称会带本次安装的标识，按助手的完成提示查找即可。程序、运行数据和同级管理缓存用于后续使用，保留安装后的目录。</p>
+
+<details id="manual"><summary>进阶排查时使用的命令行安装与检查</summary>
+<p>只有需要命令行排查时才使用这一节。进入解压目录的「安装文件」，在文件资源管理器顶部地址栏输入 <code>powershell</code>，按回车。</p>
+<p><label for="location">下方命令示例使用的安装位置</label></p>
+<select id="location"><option value="d">D 盘，安装到 D:\LiveMonitor</option><option value="local">只有 C 盘，安装到当前用户的本地应用目录</option></select>
+<p>当前命令使用 <span class="path" id="target-label">D:\LiveMonitor</span>。下面所有命令会跟随这里的选择。如果安装助手中选了其他目录，请把命令第一行的安装位置改为那个目录。</p>
+<p>点击「复制命令」，回到 PowerShell 粘贴，按回车。如果复制按钮无法使用，可选中整段代码后按 Ctrl+C。每次只执行当前这一步，等出现新的 <code>PS … &gt;</code> 提示后再继续。</p>
+<div id="copy-status" role="status" aria-live="polite"></div>
+
+<h3>先安装</h3>
+<div class="command"><div class="command-head"><strong>在「安装文件」里打开的 PowerShell 执行</strong><button type="button" data-copy="install-code">复制命令</button></div><pre><code id="install-code" data-template="install"></code></pre></div>
+<p class="done">首次成功时能看到 <code>"ok": true</code> 和 <code>"code": "installed"</code>。同一个版本重复安装时可能显示 <code>already_installed</code>，它表示已确认现有安装。</p>
+<p>安装需要复制较多文件，机械硬盘可能明显更慢。请等待命令结束。遇到红色报错、<code>ok: false</code> 或其他错误码时，先看下方「遇到问题」。</p>
+
+<h3>检查运行条件</h3>
+<div class="command"><div class="command-head"><strong>先运行基础检查</strong><button type="button" data-copy="doctor-code">复制命令</button></div><pre><code id="doctor-code" data-template="doctor"></code></pre></div>
+<p class="done"><code>checks_passed</code> 表示本次基础检查通过。若显示 <code>checks_passed_limited</code>，请按输出中的缺项和 <code>next_steps</code> 补齐后再检查。</p>
+<div class="command"><div class="command-head"><strong>基础检查通过后，再检查转写等运行模块</strong><button type="button" data-copy="imports-code">复制命令</button></div><pre><code id="imports-code" data-template="imports"></code></pre></div>
+<p>运行模块检查需要等待。确认输出中 <code>"ok": true</code> 后再开始采集。检查失败时把最后的完整错误信息发给部署人员处理。</p>
+<div class="command"><div class="command-head"><strong>启动并打开看板</strong><button type="button" data-copy="start-code">复制命令</button></div><pre><code id="start-code" data-template="start"></code></pre></div>
+<p class="done">命令行启动成功时能看到 <code>"ok": true</code> 和 <code>"board_ready": true</code>。浏览器会打开本地看板。</p>
+</details>
+
+<h2 id="first-run">双击图标打开看板，登录并添加主播</h2>
+<p>双击桌面或开始菜单的「直播监控」。助手会启动后台服务并打开本地看板。第一次加载可能需要等待，遇到错误时按助手显示的信息处理。</p>
+<p>首次默认网址为 <a href="http://127.0.0.1:8765/" target="_blank" rel="noopener">http://127.0.0.1:8765/</a>。如原安装使用了其他端口，以助手打开的网址为准。</p>
+<p>本地看板直接进入页面。抖音平台的扫码登录在下方的专用浏览器中完成。</p>
+<ol>
+<li>进入看板「设置」，找到平台登录区域，先点「准备浏览器」，等准备完成。</li>
+<li>点「打开抖音登录页」，在打开的专用浏览器里用自己的抖音扫码登录。后续采集会使用这个浏览器的登录状态。</li>
+<li>进入「主播」，点「+ 新增主播」。tag 填一个便于识别的唯一标签，例如「我的直播间」。这个标签用于关联数据，建立后请保持一致。</li>
+<li>在「抖音个人主页或 sec_uid」中粘贴主播的完整抖音个人主页链接。请使用自己有权采集的直播间，直接从个人主页复制长链接。</li>
+<li>勾选「采集弹幕/统计」，需要转写时再勾「录音+转写」。首次体验可让「自动实况分析」保持关闭。</li>
+<li>点「保存到名册」。回到「设置」，在平台登录区域的「单次检查目标」中选择刚添加的主播，再点「检查所选主播通道」，根据结果确认该目标当前可查询。</li>
+<li>回到「主播」，如果该行显示「启动」，点它开始采集。如果该行已显示运行中，可继续查看数据。先用一个正在直播的主播测试。</li>
+</ol>
+<p>主播开始直播后，在「实时」里查看弹幕和统计。转写要等录音分片封口后处理，先在设置页查看转写队列和进度。首次模型加载可能较慢，任务多时会按顺序排队。</p>
+<p>复盘时选择对应主播和日期。在复盘页的资料区点「更新资料」，随后读取或下载已经整理好的内容。成功转写并确认结果后，程序会自动清理对应原音频，转写文本继续保留。失败待处理的音频可能继续占用磁盘，可在设置页观察存储与任务状态。</p>
+
+<h2 id="daily">以后怎样启动和停止</h2>
+<ul>
+<li>双击「直播监控」，启动后台并打开看板。服务已经运行时会打开现有看板。</li>
+<li>双击「停止直播监控」，请求正常停止，并等待当前工作收尾。</li>
+</ul>
+<p>关闭网页后，后台监控仍会运行。结束监控请使用停止图标。图标会使用安装时保存的位置，启动器保存在当前用户的本地应用目录中。</p>
+<details id="daily-commands"><summary>需要排查时查看日常开关命令</summary>
+<p>从开始菜单打开 PowerShell。先在上方命令行安装区选择实际安装位置，自定义路径则修改命令第一行，再复制需要的命令。</p>
+<div class="command"><div class="command-head"><strong>启动并打开看板</strong><button type="button" data-copy="daily-start-code">复制命令</button></div><pre><code id="daily-start-code" data-template="start"></code></pre></div>
+<div class="command"><div class="command-head"><strong>查看当前状态</strong><button type="button" data-copy="status-code">复制命令</button></div><pre><code id="status-code" data-template="status"></code></pre></div>
+<div class="command"><div class="command-head"><strong>停止本地监控</strong><button type="button" data-copy="stop-code">复制命令</button></div><pre><code id="stop-code" data-template="stop"></code></pre></div>
+<p>停止时可能需要等待正在处理的工作收尾，等命令返回后再查看状态。</p>
+</details>
+<details><summary>可选，登录 Windows 后自动启动</summary>
+<p>先完成一次手动安装与采集测试，再按需启用。这个设置会创建当前 Windows 用户登录时运行的计划任务。它在登录后启动后台，查看看板时仍打开上述本地网址。</p>
+<div class="command"><div class="command-head"><strong>启用登录后自启</strong><button type="button" data-copy="auto-on-code">复制命令</button></div><pre><code id="auto-on-code" data-template="auto-on"></code></pre></div>
+<p>看到 <code>"state": "enabled"</code> 且 <code>"enabled": true</code> 后，下一次重新登录 Windows 时检查看板。启动等待较久或未打开时，按「查看当前状态」读回，并联系部署人员核对。</p>
+<div class="command"><div class="command-head"><strong>关闭登录后自启</strong><button type="button" data-copy="auto-off-code">复制命令</button></div><pre><code id="auto-off-code" data-template="auto-off"></code></pre></div>
+</details>
+
+<h2 id="agent">可选，把资料交给自己的智能体</h2>
+<p>先完成采集和转写，在复盘页点「更新资料」。自己的智能体客户端需要支持这台 Windows 电脑上的 stdio MCP。打开客户端的 MCP 设置后，可用下面的命令生成包含真实安装路径的配置。</p>
+<div class="command"><div class="command-head"><strong>在 PowerShell 中生成 MCP 配置</strong><button type="button" data-copy="mcp-code">复制命令</button></div><pre><code id="mcp-code" data-template="mcp"></code></pre></div>
+<p>把输出的配置按客户端说明填入。已有其他 MCP 配置时，将新项合并进去。不同客户端的配置入口和外层格式可能不同，可向部署人员确认。接入后可以让智能体查找某个主播、某个日期的弹幕与转写材料，再按自己的需求分析。</p>
+<p>内置 AI 分析也可以在设置页按需配置提供商、模型和 API Key。使用外部模型可能产生费用，保存密钥后按需开启相应功能。</p>
+
+<h2 id="help">遇到问题，按提示处理</h2>
+<table>
+<thead><tr><th scope="col">看到的情况</th><th scope="col">处理方法</th></tr></thead>
+<tbody>
+<tr><td>双击安装器后窗口一闪而过</td><td>确认点的是外层「安装直播监控.exe」。内层 CustomerSetup.exe 是命令行维护入口，需要参数。若外层助手也未打开，请检查上方 .NET 运行环境，并把错误信息交给部署人员。</td></tr>
+<tr><td>安装完成，但桌面图标没有出现</td><td>先在开始菜单搜索「直播监控」。系统保护、目录联接或某些云端重定向桌面可能阻止图标创建，助手会显示结果。开始菜单也没有图标时，保留安装目录并联系部署人员补建。</td></tr>
+<tr><td>找不到 CustomerSetup.exe 或路径不存在</td><td>确认已完整解压，PowerShell 是从真正包含安装器的「安装文件」目录打开。下载目录里可能多套了一层同名文件夹，请进入正确层级。</td></tr>
+<tr><td>提示 D 盘不存在</td><td>回到本指南的安装位置选择器，选择「只有 C 盘」，重新复制相应命令。</td></tr>
+<tr><td>缺少 MSVCP140、VCRUNTIME140，或转写模块导入失败</td><td>从上方微软页面安装或修复 VC++ v14 的 X64 运行库，再重新运行模块检查。若仍失败，提供完整错误码供部署人员排查。</td></tr>
+<tr><td>提示需要 .NET，或程序尚未输出就无法打开</td><td>从上方微软页面安装兼容的 .NET Framework Runtime，完成系统要求的操作后再执行安装命令。</td></tr>
+<tr><td>安装目录过长，或提示 install_native_path_too_long</td><td>改用新的较短安装目录，例如 D:\LiveMonitor。已有失败目录先保留，联系部署人员确认后处理。</td></tr>
+<tr><td>显示 manifest_mismatch、bundle_unlisted_path 或校验失败</td><td>重新取得这份完整分发包并解压到新目录，使用本指南对应的命令。把错误码反馈给部署人员。</td></tr>
+<tr><td>浏览器没有打开，或本地网址连不上</td><td>查看启动命令的结果。只有确认 board_ready 为 true 后再打开本地网址。状态报错或端口被占用时，把结果交给部署人员核对。</td></tr>
+<tr><td>主播已添加，但暂时没有数据</td><td>确认已点主播行的「启动」、主播正在直播、专用浏览器已经登录。检查设置页的平台状态、采集状态和转写队列。</td></tr>
+<tr><td>直播已经结束，转写仍在等待</td><td>查看设置页队列，等待已封口的片段按顺序处理。先用一路直播测试当前电脑的处理速度，再调整采集数量。</td></tr>
+<tr><td>提示 75、78、unknown 或占用未确认</td><td>保留当前目录和现场，把最后的完整错误信息发给部署人员。等待占用或归属问题核对后继续。</td></tr>
+</tbody></table>
+<p>求助时提供 Windows 版本、选择的安装位置、操作到哪一步，以及末尾错误信息。截图前遮住自己的密钥、账号隐私和直播内容。</p>
+<p class="muted">进阶安装与维护说明见「安装文件」里的 AGENT_INSTALL.md。请以当前发布页列出的验证范围和已知问题为准。具体设备的安装耗时、并发能力和平台连接情况，以实际检查结果为准。</p>
+</main>
+<script>
+'use strict';
+const manifest = '__BUNDLE_MANIFEST_SHA256__';
+const actions = {
+  install: '& .\\CustomerSetup.exe install --target $target --manifest-sha256 \'' + manifest + '\'',
+  doctor: '& (Join-Path $target \'entry\\CustomerLauncher.exe\') doctor --target $target',
+  imports: '& (Join-Path $target \'entry\\CustomerLauncher.exe\') doctor-imports --target $target',
+  start: '& (Join-Path $target \'entry\\CustomerLauncher.exe\') start --target $target --open',
+  status: '& (Join-Path $target \'entry\\CustomerLauncher.exe\') status --target $target',
+  stop: '& (Join-Path $target \'entry\\CustomerLauncher.exe\') stop --target $target',
+  'auto-on': '& (Join-Path $target \'runtime\\python\\python.exe\') -B (Join-Path $target \'app\\scripts\\local_app.py\') autostart enable',
+  'auto-off': '& (Join-Path $target \'runtime\\python\\python.exe\') -B (Join-Path $target \'app\\scripts\\local_app.py\') autostart disable',
+  mcp: '$config = @{ mcpServers = @{ live_monitor = @{ command = (Join-Path $target \'entry\\CustomerLauncher.exe\'); args = @(\'mcp\', \'--target\', $target) } } }\n$config | ConvertTo-Json -Depth 5'
+};
+const selector = document.getElementById('location');
+const status = document.getElementById('copy-status');
+function renderCommands() {
+  const onD = selector.value === 'd';
+  const declaration = onD ? "$target = 'D:\\LiveMonitor'" : "$target = Join-Path $env:LOCALAPPDATA 'LiveMonitor'";
+  document.getElementById('target-label').textContent = onD ? 'D:\\LiveMonitor' : '%LOCALAPPDATA%\\LiveMonitor（当前 Windows 用户）';
+  document.querySelectorAll('code[data-template]').forEach(function (code) {
+    code.textContent = declaration + '\n' + actions[code.dataset.template];
+  });
+  status.textContent = '复制的命令会使用上面选择的安装位置。';
+}
+selector.addEventListener('change', renderCommands);
+document.querySelectorAll('button[data-copy]').forEach(function (button) {
+  button.addEventListener('click', async function () {
+    const code = document.getElementById(button.dataset.copy);
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('clipboard_unavailable');
+      await navigator.clipboard.writeText(code.textContent);
+      status.textContent = '已复制。回到 PowerShell 粘贴，再按回车执行。';
+      button.textContent = '已复制';
+    } catch (error) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (copyError) {
+        copied = false;
+      }
+      status.textContent = copied ? '已复制。回到 PowerShell 粘贴，再按回车执行。' : '命令已选中，请按 Ctrl+C 复制。';
+      button.textContent = copied ? '已复制' : '按 Ctrl+C 复制';
+    }
+  });
+});
+renderCommands();
+</script>
+<noscript><p style="margin:24px">此浏览器关闭了 JavaScript，请在 Edge 中重新打开这份本地指南，以显示安装命令。</p></noscript>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "customer_installation",
+  "app": "app",
+  "state": "state",
+  "python": "runtime/python/python.exe",
+  "node": "runtime/node/node.exe",
+  "ffmpeg": "runtime/ffmpeg/ffmpeg.exe",
+  "model": "assets/models/faster-whisper-small",
+  "cache": "state/cache",
+  "browser": { "kind": "system-edge" },
+  "dll_directories": [
+    "runtime/python",
+    "runtime/python/Lib/site-packages/pywin32_system32",
+    "runtime/python/Lib/site-packages/numpy.libs",
+    "runtime/python/Lib/site-packages/curl_cffi.libs",
+    "runtime/python/Lib/site-packages/ctranslate2",
+    "runtime/python/Lib/site-packages/av.libs",
+    "runtime/python/Lib/site-packages/onnxruntime/capi",
+    "runtime/python/Lib/site-packages/py_mini_racer"
+  ],
+  "ports": { "board": 8765, "cdp": 29222 }
+}

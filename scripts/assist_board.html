@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>直播辅助看板</title>
+<style>
+:root{
+  --bg:#101418; --panel:#1a2027; --line:#2a323c; --ink:#e8ecf1; --dim:#8b97a5;
+  --red:#e5484d; --green:#30a46c; --blue:#4c8dff; --amber:#e6a23c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI","Microsoft YaHei",sans-serif;padding:18px;min-height:100vh}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-size:18px;font-weight:600}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+.dot{width:9px;height:9px;border-radius:50%;background:#666}
+.dot.on{background:var(--green)}.dot.off{background:var(--red)}
+.meta{font-size:12px;color:var(--dim)}
+.spacer{flex:1}
+.logout{background:none;border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+.logout:hover{color:var(--ink);border-color:var(--blue)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{padding:7px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer;font-size:14px}
+.tab.active{border-color:var(--blue);color:var(--blue);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .k{font-size:12px;color:var(--dim)}
+.kpi .v{font-size:38px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .v.online{color:var(--blue)}
+.kpi .s{font-size:11px;color:var(--dim);margin-top:2px}
+.kpi.cold-ok{border-color:rgba(48,164,108,.5)}
+.kpi.cold-bad{border-color:var(--red);background:#2a1a1c}
+.kpi.cold-bad .v{color:var(--red);font-size:22px;line-height:1.3}
+.coldlines{margin-top:6px;font-size:12px;color:var(--amber);max-height:84px;overflow-y:auto}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.panel h3{font-size:13px;font-weight:600;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between}
+.qa{list-style:none}
+.qa li{padding:6px 0;border-bottom:1px dashed var(--line)}
+.qa .q{font-size:14px;font-weight:600}
+.qa .c{color:var(--amber);font-size:12px;margin-left:6px}
+.qa .ex{color:var(--dim);font-size:12px;margin-top:2px}
+.sugg{list-style:none}
+.sugg li{padding:5px 0 5px 18px;position:relative;font-size:14px}
+.sugg li::before{content:"→";position:absolute;left:0;color:var(--blue)}
+.trend svg{width:100%;height:110px;display:block}
+.strip{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-bottom:14px}
+.strip b{color:var(--ink);font-size:15px;margin-left:4px;font-variant-numeric:tabular-nums}
+/* 弹幕流：新消息在顶部。悬停时锁定视觉位置，不被新帧顶走。 */
+.feed{max-height:260px;overflow-y:auto;font-size:13px}
+.feed .row{padding:4px 0;border-bottom:1px dashed var(--line);display:flex;gap:8px}
+.feed .t{color:var(--dim);font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.feed .u{color:var(--blue);white-space:nowrap}
+.feed .row.gift .u{color:var(--amber)}
+.feed-hint{font-size:11px;color:var(--dim);font-weight:400}
+.waiting{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:10px;color:var(--dim)}
+.waiting .big{font-size:26px;color:var(--ink)}
+footer{margin-top:14px;font-size:11px;color:var(--dim)}
+/* 登录遮罩 */
+.mask{position:fixed;inset:0;background:rgba(8,11,14,.96);display:flex;align-items:center;justify-content:center;z-index:50}
+.mask[hidden]{display:none}
+.login{width:320px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 24px}
+.login h2{font-size:17px;margin-bottom:6px}
+.login .hint{font-size:12px;color:var(--dim);margin-bottom:16px}
+.login label{display:block;font-size:12px;color:var(--dim);margin:12px 0 5px}
+.login input{width:100%;background:#0d1116;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px 11px;font-size:14px}
+.login input:focus{outline:none;border-color:var(--blue)}
+.login button{width:100%;margin-top:18px;background:var(--blue);color:#fff;border:0;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer}
+.login button:disabled{opacity:.6;cursor:default}
+.login .err{color:var(--red);font-size:12px;margin-top:10px;min-height:16px}
+</style>
+</head>
+<body>
+
+<div class="mask" id="mask" hidden>
+  <form class="login" id="loginForm">
+    <h2>直播辅助看板</h2>
+    <div class="hint">内部工具 · 请用分配的账号登录</div>
+    <label for="username">用户名</label>
+    <input id="username" value="admin" autocomplete="username" spellcheck="false">
+    <label for="password">密码</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <button type="submit" id="loginBtn">登录</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+</div>
+
+<header>
+  <h1>直播辅助看板</h1>
+  <span class="badge"><span class="dot" id="conn"></span><span id="connTxt">连接中…</span></span>
+  <span class="meta" id="meta"></span>
+  <span class="spacer"></span>
+  <span class="meta" id="who"></span>
+  <button class="logout" id="logoutBtn" hidden>退出</button>
+</header>
+<div class="tabs" id="tabs"></div>
+<div id="main"></div>
+<footer>只读 tail data/*.jsonl · SSE 1s 共享快照 · 冷场判定=coldline 事件 180s 窗口 · 画像/提问聚类为 LLM 快照（非实时）</footer>
+<script>
+let SNAP=null, ACTIVE=null, ES=null, ME=null, lastAuthCheck=0;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtN=n=>n==null?"—":(n>=10000?(n/10000).toFixed(1)+"w":String(n));
+const fmtT=ts=>new Date(ts*1000).toTimeString().slice(0,8);
+
+// ---------------- 登录 ----------------
+function showLogin(msg){
+  $("#mask").hidden=false;
+  $("#loginErr").textContent=msg||"";
+  setTimeout(()=>$("#password").focus(),50);
+}
+function hideLogin(){
+  $("#mask").hidden=true;
+  $("#loginErr").textContent="";
+  $("#password").value="";
+}
+$("#loginForm").addEventListener("submit", async ev=>{
+  ev.preventDefault();
+  const btn=$("#loginBtn");
+  btn.disabled=true; $("#loginErr").textContent="";
+  try{
+    const body={username:($("#username").value||"admin").trim(),password:$("#password").value};
+    const r=await fetch("/api/login",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(r.ok){
+      ME=await r.json(); hideLogin(); paintWho(); startSSE();
+    }else{
+      const j=await r.json().catch(()=>({}));
+      $("#loginErr").textContent=j.error||("登录失败（"+r.status+"）");
+    }
+  }catch(e){
+    $("#loginErr").textContent="连不上服务，检查网络/看板是否在跑";
+  }finally{ btn.disabled=false; }
+});
+$("#logoutBtn").addEventListener("click", async ()=>{
+  try{ await fetch("/api/logout",{method:"POST"}); }catch(e){}
+  if(ES){ES.close();ES=null;}
+  ME=null; SNAP=null; $("#who").textContent=""; $("#logoutBtn").hidden=true;
+  $("#main").innerHTML=""; $("#tabs").innerHTML="";
+  showLogin("已退出");
+});
+function paintWho(){
+  if(!ME) return;
+  $("#who").textContent=ME.user+(ME.role&&ME.role!=="member"?"（"+ME.role+"）":"");
+  $("#logoutBtn").hidden=false;
+}
+
+// ---------------- SSE ----------------
+function startSSE(){
+  if(ES) ES.close();
+  ES=new EventSource("/api/sse");
+  ES.addEventListener("open",()=>{$("#conn").className="dot on";$("#connTxt").textContent="已连接（SSE）"});
+  ES.addEventListener("error",async ()=>{
+    $("#conn").className="dot off";$("#connTxt").textContent="断开，自动重连中…";
+    // cookie 过期（12h）时 EventSource 会一直 401 重连 → 主动查一次身份
+    const now=Date.now();
+    if(now-lastAuthCheck<5000) return;
+    lastAuthCheck=now;
+    try{
+      const r=await fetch("/api/me",{cache:"no-store"});
+      if(!r.ok){
+        if(ES){ES.close();ES=null;}
+        ME=null; $("#who").textContent=""; $("#logoutBtn").hidden=true;
+        showLogin("登录已过期，请重新登录");
+      }
+    }catch(e){}
+  });
+  ES.addEventListener("snapshot",e=>{SNAP=JSON.parse(e.data);render();});
+}
+
+async function boot(){
+  try{
+    const r=await fetch("/api/me",{cache:"no-store"});
+    if(r.ok){ ME=await r.json(); paintWho(); startSSE(); }
+    else showLogin();
+  }catch(e){ showLogin("连不上服务"); }
+}
+
+// ---------------- 渲染 ----------------
+function render(){
+  if(!SNAP) return;
+  const tags=SNAP.tags||[];
+  $("#meta").textContent="日期 "+SNAP.date+" · 快照 "+fmtT(SNAP.now_ts);
+  if(!tags.length){
+    $("#tabs").innerHTML="";
+    $("#main").innerHTML='<div class="waiting"><div class="big">等待数据…</div><div>当日尚无落盘文件：'+esc(SNAP.data_dir)+'</div></div>';
+    return;
+  }
+  if(!ACTIVE||!tags.some(t=>t.tag===ACTIVE)){
+    const lv=tags.find(t=>t.live[0]); ACTIVE=lv?lv.tag:tags[0].tag;
+  }
+  $("#tabs").innerHTML=tags.map(t=>{
+    const mark=t.live[0]?' <span class="dot on" style="display:inline-block;vertical-align:middle"></span>':"";
+    return '<button class="tab'+(t.tag===ACTIVE?' active':'')+'" onclick="pick(\''+encodeURIComponent(t.tag)+'\')">'+esc(t.tag)+mark+'</button>';
+  }).join("");
+  const t=tags.find(x=>x.tag===ACTIVE);
+
+  if(!t.live[0]){
+    if(t.stale){
+      $("#main").innerHTML='<div class="waiting"><div class="big" style="color:#b45309">数据停滞 · 采集疑似未运行</div>'
+        +'<div>数据显示至 '+fmtT(t.last_ts)+'（已 '+(t.data_age!=null?Math.round(t.data_age/60):'—')+' 分钟无新数据）'
+        +'——主播可能正在直播而我们没在采，请检查采集进程/看板侧不做臆测</div></div>';
+    } else {
+      $("#main").innerHTML='<div class="waiting"><div class="big">未开播 · 等待开播事件</div><div>判定依据：'+esc(t.live[1])+(t.last_ts?' · 最近活动 '+fmtT(t.last_ts):'')+'</div></div>';
+    }
+    return;
+  }
+
+  // ---- 重绘前先记下弹幕流的滚动状态（整块 innerHTML 重建会丢 scrollTop）----
+  const oldFeed=document.getElementById("feed");
+  const prevTop=oldFeed?oldFeed.scrollTop:0;
+  const prevH=oldFeed?oldFeed.scrollHeight:0;
+  const hovering=oldFeed?oldFeed.dataset.hover==="1":false;
+
+  const cold=t.cold||{state:"normal",lines:[]};
+  let coldHtml;
+  if(cold.state==="cold"){
+    coldHtml='<div class="k">冷场预警</div><div class="v">冷场中</div>'
+      +'<div class="coldlines">'+(cold.lines||[]).map(l=>esc(l)).join("<br>")+'</div>';
+  }else{
+    coldHtml='<div class="k">冷场预警</div><div class="v">正常</div>'
+      +'<div class="s">'+(cold.ts?('上次冷场 '+fmtT(cold.ts)):'今日暂无冷场事件')+'</div>';
+  }
+  const qa=(t.questions||[]).map(q=>
+    '<li><span class="q">'+esc(q.topic||"—")+'</span><span class="c">×'+(q.count||0)+'</span>'
+    +((q.examples&&q.examples.length)?'<div class="ex">如：'+esc(q.examples[0])+'</div>':"")+'</li>').join("")
+    ||'<li><span class="q" style="color:var(--dim)">暂无画像快照</span></li>';
+  const sugg=(t.suggestions||[]).map(s=>'<li>'+esc(s)+'</li>').join("")
+    ||'<li style="color:var(--dim)">暂无建议</li>';
+  // 倒序：最新一条在最上面
+  const feedRows=(t.recent_danmaku||[]).slice().reverse().map(d=>
+    '<div class="row'+(d.gift?' gift':'')+'"><span class="t">'+fmtT(d.ts)+'</span><span class="u">'+esc(d.uname)+'</span><span>'+esc(d.text)+'</span></div>').join("");
+
+  $("#main").innerHTML=
+   '<div class="kpis">'
+   +'<div class="kpi"><div class="k">当前在线</div><div class="v online">'+fmtN(t.online)+'</div><div class="s">'+esc(t.live[1])+'</div></div>'
+   +'<div class="kpi"><div class="k">今日累计观看 PV</div><div class="v">'+fmtN(t.total_pv)+'</div><div class="s">来源 stats 流 room_user_seq</div></div>'
+   +'<div class="kpi"><div class="k">弹幕流速</div><div class="v">'+t.rate_per_min+'</div><div class="s">条/分 · 近5分钟均值</div></div>'
+   +'<div class="kpi '+(cold.state==="cold"?"cold-bad":"cold-ok")+'">'+coldHtml+'</div>'
+   +'</div>'
+   +'<div class="panel trend"><h3>在线人数走势（近120s）</h3>'+trend(t.online_series,SNAP.now_ts)+'</div>'
+   +'<div class="strip">'
+   +'<span>弹幕<b>'+fmtN(t.totals.danmaku)+'</b></span><span>进入<b>'+fmtN(t.totals.enter)+'</b></span>'
+   +'<span>点赞<b>'+fmtN(t.totals.like)+'</b></span><span>礼物<b>'+fmtN(t.totals.gift)+'</b></span>'
+   +(t.portrait_ts?'<span>画像快照<b>'+fmtT(t.portrait_ts)+'</b></span>':'')
+   +'</div>'
+   +'<div class="cols">'
+   +'<div class="panel"><h3>观众在问什么<span>提问聚类 Top5</span></h3><ul class="qa">'+qa+'</ul></div>'
+   +'<div><div class="panel"><h3>LLM 给主播的建议</h3><ul class="sugg">'+sugg+'</ul></div>'
+   +'<div class="panel"><h3>弹幕流<span class="feed-hint">最新在上 · 悬停暂停跟随</span></h3>'
+   +'<div class="feed" id="feed">'+feedRows+'</div></div></div>'
+   +'</div>';
+
+  // ---- 恢复滚动位置：新消息插在顶部，把新增高度补进 scrollTop 才不跳 ----
+  const feed=document.getElementById("feed");
+  if(!feed) return;
+  if(hovering) feed.dataset.hover="1";
+  if(hovering||prevTop>4){
+    feed.scrollTop=prevTop+(feed.scrollHeight-prevH);   // 锁定视觉位置
+  }else{
+    feed.scrollTop=0;                                   // 本来就在顶部 → 跟随最新
+  }
+  feed.addEventListener("mouseenter",()=>{feed.dataset.hover="1";});
+  feed.addEventListener("mouseleave",()=>{feed.dataset.hover="";feed.scrollTop=0;});
+}
+function pick(enc){ACTIVE=decodeURIComponent(enc);render()}
+
+function trend(series,now){
+  const pts=(series||[]).filter(p=>p[0]>=now-120);
+  if(pts.length<2) return '<div style="color:var(--dim);font-size:12px;padding:20px 0">数据不足（stats 流约 10s 一条，等一会儿）</div>';
+  const W=760,H=110,P=6;
+  const t0=now-120, t1=now;
+  const vals=pts.map(p=>p[1]);
+  const mn=Math.min(...vals), mx=Math.max(...vals);
+  const span=Math.max(1,mx-mn);
+  const xy=p=>[((p[0]-t0)/(t1-t0))*(W-2*P)+P, H-P-((p[1]-mn)/span)*(H-2*P)];
+  let d="",lastX=null;
+  pts.forEach((p,i)=>{
+    const [x,y]=xy(p);
+    // 断档>60s 不连线（场次切换），只落点
+    if(lastX!==null && p[0]-pts[i-1][0]<=60){ d+="L"+x.toFixed(1)+" "+y.toFixed(1); }
+    else{ d+="M"+x.toFixed(1)+" "+y.toFixed(1); }
+    lastX=x;
+  });
+  const last=pts[pts.length-1];
+  const [lx,ly]=xy(last);
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="在线人数走势">'
+    +'<path d="'+d+'" fill="none" stroke="#4c8dff" stroke-width="2"/>'
+    +'<circle cx="'+lx+'" cy="'+ly+'" r="3.5" fill="#4c8dff"/>'
+    +'<text x="'+P+'" y="12" fill="#8b97a5">峰 '+mx+'</text>'
+    +'<text x="'+(W-P)+'" y="12" text-anchor="end" fill="#8b97a5">最新 '+last[1]+'</text>'
+    +'</svg>';
+}
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "model": "faster-whisper-small",
+  "upstream_repository": "Systran/faster-whisper-small",
+  "revision": "536b0662742c02347bc0e980a01041f333bce120",
+  "canonical_source": "https://huggingface.co/Systran/faster-whisper-small/tree/536b0662742c02347bc0e980a01041f333bce120",
+  "lookup_date": "2026-11-14",
+  "files": {
+    "model.bin": {
+      "sha256": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "bytes": 483546902,
+      "canonical_content_match": true,
+      "download_url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/model.bin"
+    },
+    "config.json": {
+      "sha256": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "bytes": 2370,
+      "canonical_content_match": true,
+      "download_url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/config.json"
+    },
+    "tokenizer.json": {
+      "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "bytes": 2203239,
+      "canonical_content_match": true,
+      "download_url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/tokenizer.json"
+    },
+    "vocabulary.txt": {
+      "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+      "bytes": 459861,
+      "canonical_content_match": true,
+      "download_url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/vocabulary.txt"
+    }
+  },
+  "weights_bundled": false,
+  "mode": {
+    "device": "cpu",
+    "compute_type": "int8"
+  },
+  "license_metadata": "MIT metadata on the canonical model page; retain the exact model license and attribution in distributions."
+}
