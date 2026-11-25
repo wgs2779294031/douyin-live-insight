@@ -624,8 +624,8 @@
     },
     {
       "path": "packaging/bundle_inputs.py",
-      "bytes": 10331,
-      "sha256": "d0e2a2416d156773facdcc40ec5e66d44f9d530dc237cecc6add08e0a6d6e434",
+      "bytes": 11398,
+      "sha256": "5bc9250132ab2bc1e706a87192ea4c6645b26298112df6741756134dfff627f9",
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
@@ -666,8 +666,8 @@
     },
     {
       "path": "packaging/tests/test_packaging.py",
-      "bytes": 9502,
-      "sha256": "fc42b47cb8840c8e780c69e8cbb65ee1f8c2cd4fa519a0add73f5bd156bd1d61",
+      "bytes": 12072,
+      "sha256": "66c4f785ea1a378a404bee195234016a880a0a91d5466ea8046a6029f6d3d4fb",
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {

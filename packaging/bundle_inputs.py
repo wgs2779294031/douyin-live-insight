@@ -202,8 +202,24 @@ class ValidatedBundle:
         require(isinstance(rows, list) and isinstance(dirs, list), "bundle_manifest_invalid")
         declared, aliases = {}, set()
         for row in rows:
-            require(isinstance(row, dict) and set(row) == {"path", "bytes", "sha256"}, "invalid_manifest_row")
+            require(isinstance(row, dict) and set(row) == {"path", "bytes", "sha256", "component"},
+                    "invalid_manifest_row")
             name = relative_name(row["path"])
+            component = row["component"]
+            valid_component = (
+                (component == "product" and name.startswith("payload/")
+                 and (name.split("/")[1] in {"app", "runtime", "assets", "notices"}
+                      or name in {"payload/installation.json", "payload/payload-manifest.json"}))
+                or (component == "manager" and (name.startswith("manager/python/") or name in {
+                    "manager/code/customer_bundle.py", "manager/code/customer_install.py",
+                    "manager/code/local_doctor.py", "manager/code/customer_upgrade.py",
+                    "manager/code/customer_upgrade_gate.py"}))
+                or (component == "entry" and name in {
+                    "entry/CustomerLauncher.exe", "entry/CustomerLauncherW.exe"})
+                or (component == "bootstrap" and name == "CustomerSetup.exe")
+                or (component == "guide" and name == "AGENT_INSTALL.md")
+            )
+            require(valid_component, "invalid_manifest_component")
             require(name != "bundle.manifest.json" and name.casefold() not in aliases, "duplicate_manifest_path")
             aliases.add(name.casefold())
             require(type(row["bytes"]) is int and 0 <= row["bytes"] <= MAX_FILE, "invalid_manifest_row")

@@ -20,18 +20,27 @@ from bundle_inputs import PackagingError, ValidatedBundle, digest_file, json_byt
 from package_with_guide import package
 
 
-def fixture_bundle(path, *, extra=None, duplicate=False, symlink=False, wrong_content=False):
-    payload = {"CustomerSetup.exe": b"MZ synthetic setup; never executed", "payload/readme.txt": b"synthetic payload"}
+def fixture_bundle(path, *, extra=None, duplicate=False, symlink=False, wrong_content=False, mutate_rows=None):
+    payload = {"CustomerSetup.exe": b"MZ synthetic setup; never executed", "payload/app/readme.txt": b"synthetic payload"}
     if extra:
         payload.update(extra)
-    rows = [{"path": name, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
+    def component(name):
+        return ("bootstrap" if name == "CustomerSetup.exe" else "guide" if name == "AGENT_INSTALL.md"
+                else "manager" if name.startswith("manager/") else "entry" if name.startswith("entry/")
+                else "product")
+    rows = [{"path": name, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(), "component": component(name)}
             for name, raw in payload.items()]
+    if mutate_rows is not None:
+        mutate_rows(rows)
+    directories = sorted({"/".join(name.split("/")[:index]) for name in payload
+                          for index in range(1, len(name.split("/")))})
     manifest = {"schema": 1, "kind": "customer_bundle", "version": "customer-local-11B2",
                 "channel": "local-candidate", "state_compatibility": 1,
-                "files": rows, "directories": ["payload"], "product_metadata": []}
+                "files": rows, "directories": directories, "product_metadata": []}
     raw_manifest = json_bytes(manifest)
     with zipfile.ZipFile(path, "x", zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("payload/", b"")
+        for directory in directories:
+            archive.writestr(directory + "/", b"")
         for name, raw in payload.items():
             archive.writestr(name, b"tampered payload" if wrong_content and name.endswith("readme.txt") else raw)
         archive.writestr("bundle.manifest.json", raw_manifest)
@@ -94,7 +103,7 @@ class PackagingTests(unittest.TestCase):
         self.assertEqual(result["bundle_channel"], "local-candidate")
         with zipfile.ZipFile(self.output) as archive:
             self.assertEqual(archive.read("安装文件/bundle.manifest.json"), self.facts["manifest_raw"])
-            self.assertEqual(archive.read("安装文件/payload/readme.txt"), b"synthetic payload")
+            self.assertEqual(archive.read("安装文件/payload/app/readme.txt"), b"synthetic payload")
             guide = archive.read("先读我-安装指南.html")
             self.assertIn(self.facts["bundle_manifest_sha256"].encode("ascii"), guide)
             self.assertNotIn(b"__BUNDLE_MANIFEST_SHA256__", guide)
@@ -102,6 +111,36 @@ class PackagingTests(unittest.TestCase):
 
     def test_wrong_trusted_bundle_sha_is_refused(self):
         self.reject("bundle_sha256_mismatch", bundle_sha256="0" * 64)
+
+    def test_formal_component_fields_are_retained_for_all_path_groups(self):
+        bundle = self.work / "all-components.zip"
+        facts = fixture_bundle(bundle, extra={"manager/code/customer_bundle.py": b"# synthetic manager source\n",
+                                              "entry/CustomerLauncher.exe": b"MZ synthetic entry; never executed",
+                                              "AGENT_INSTALL.md": b"Synthetic guide\n"})
+        with ValidatedBundle(bundle, facts["bundle_sha256"]) as checked:
+            observed = {row["component"] for name, row in checked.expected_files.items()
+                        if name != "bundle.manifest.json"}
+            self.assertEqual(observed, {"product", "manager", "entry", "bootstrap", "guide"})
+
+    def test_missing_component_field_is_refused(self):
+        bundle = self.work / "missing-component.zip"
+        facts = fixture_bundle(bundle, mutate_rows=lambda rows: rows[0].pop("component"))
+        self.reject("invalid_manifest_row", bundle=bundle, bundle_sha256=facts["bundle_sha256"])
+
+    def test_illegal_component_is_refused(self):
+        bundle = self.work / "illegal-component.zip"
+        facts = fixture_bundle(bundle, mutate_rows=lambda rows: rows[0].update(component="unrecognized"))
+        self.reject("invalid_manifest_component", bundle=bundle, bundle_sha256=facts["bundle_sha256"])
+
+    def test_component_for_wrong_path_is_refused(self):
+        bundle = self.work / "wrong-path-component.zip"
+        facts = fixture_bundle(bundle, mutate_rows=lambda rows: rows[0].update(component="manager"))
+        self.reject("invalid_manifest_component", bundle=bundle, bundle_sha256=facts["bundle_sha256"])
+
+    def test_extra_manifest_row_field_is_refused(self):
+        bundle = self.work / "extra-row-field.zip"
+        facts = fixture_bundle(bundle, mutate_rows=lambda rows: rows[0].update(extra="not permitted"))
+        self.reject("invalid_manifest_row", bundle=bundle, bundle_sha256=facts["bundle_sha256"])
 
     def test_member_path_traversal_is_refused(self):
         bad = self.work / "traversal.zip"
