@@ -1,34 +1,34 @@
-name: ���ܽ���
-description: ����ʹ�ó�����ϣ�����������
-title: "[����] "
+name: 功能建议
+description: 描述使用场景和希望解决的问题
+title: "[建议] "
 body:
   - type: markdown
     attributes:
       value: |
-        �¹��ܡ���ƽ̨�����������Ķ�����Ҫ��ȡ����Ŀ������ͬ����ʵʩ��
-        �ύ���鲻������Ŀ�ѳ�ŵʵ�ֻ�ȷ������ʱ�䡣�벻Ҫ����ƾ�ݻ���ʵ�ɼ����ϡ�
+        新功能、跨平台适配和其他大改动，需要先取得项目所有者同意后才实施。
+        提交建议不代表项目已承诺实现或确定发布时间。请不要附上凭据或真实采集资料。
   - type: textarea
     id: problem
     attributes:
-      label: ϣ�����ʲô���⣿
-      description: ˵��ʵ�ʳ�������Ӱ���ʹ���������Ƶ�ʡ�
+      label: 希望解决什么问题？
+      description: 说明实际场景、受影响的使用者与出现频率。
     validations:
       required: true
   - type: textarea
     id: current
     attributes:
-      label: ��ǰ��δ�����
-      description: ���й��ܻ������취Ϊʲô���㣿
+      label: 当前如何处理？
+      description: 已有功能或其他办法为什么不足？
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: �������Ϊ��ɽ��ܵ�ȡ��
-      description: �������������������д���룻��˵���Ƿ���Ҫ�������á�Ȩ�޻�ϵͳ֧�֡�
+      label: 建议的行为与可接受的取舍
+      description: 可以提出方案，但不必写代码；请说明是否需要新增费用、权限或系统支持。
     validations:
       required: true
   - type: input
     id: platform
     attributes:
-      label: ���ƽ̨��汾����ѡ��
+      label: 相关平台或版本（可选）

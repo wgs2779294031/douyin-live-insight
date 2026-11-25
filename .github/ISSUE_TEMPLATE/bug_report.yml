@@ -1,58 +1,58 @@
-name: ���ⷴ��
-description: ���氲װ���ɼ���תд����ѯ��ֹͣ�ָ��е�����
-title: "[����] "
+name: 问题反馈
+description: 报告安装、采集、转写、查询或停止恢复中的问题
+title: "[问题] "
 body:
   - type: markdown
     attributes:
       value: |
-        ���������������⡣Դ����Ͱ�װ���������ʱ������Դ��鵵��Ϊ�ɰ�װ���԰档
-        ��Ҫ�ϴ� Cookie����ά�롢��¼̬��API ��Կ��Webhook����������á���ʵ¼����תд���ġ�
-        ��ȫ©���밴 SECURITY.md ˽�±��棬���ڴ˹�������ϸ�ڡ�
+        请先搜索已有问题。源代码和安装包尚在审核时，请勿将源码归档视为可安装测试版。
+        不要上传 Cookie、二维码、登录态、API 密钥、Webhook、浏览器配置、真实录音或转写正文。
+        安全漏洞请按 SECURITY.md 私下报告，不在此公开利用细节。
   - type: input
     id: version
     attributes:
-      label: �����汾�밲װ������
-      description: �뱣���������԰�汾�ţ���δʹ�ù������԰�ʱ����ȷ˵����
-      placeholder: ���磺�汾�š���װ���ļ���������δ��װ
+      label: 软件版本与安装包名称
+      description: 请保留完整测试版版本号；尚未使用公开测试版时请明确说明。
+      placeholder: 例如：版本号、安装包文件名，或尚未安装
     validations:
       required: true
   - type: input
     id: system
     attributes:
-      label: ����ϵͳ����ػ���
-      description: Windows �汾��������ֱ����ص��������Ӳ����Ϣ������Ҫ�ṩ�豸���кš�
+      label: 操作系统与相关环境
+      description: Windows 版本及与问题直接相关的浏览器或硬件信息，不需要提供设备序列号。
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
-      label: ���ֲ���
-      description: ��ʲô״̬��ʼ����ʲô˳��������Ƿ�ÿ�γ��֣�
+      label: 复现步骤
+      description: 从什么状态开始，按什么顺序操作，是否每次出现？
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Ԥ�ڽ��
+      label: 预期结果
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: ʵ�ʽ���뷢��ʱ��
-      description: ����ʵ�ʿ���������������ʵ���Ʋ⡣
+      label: 实际结果与发生时间
+      description: 描述实际看到的现象，区分事实与推测。
     validations:
       required: true
   - type: textarea
     id: diagnostics
     attributes:
-      label: ��Ҫ�Ĵ�����ʾ���������Ƭ�Σ���ѡ��
-      description: ֻ�ṩ��λ�������СƬ�Σ���ͼ���ڸ��˺��������Ϣ����Ҫ�ϴ�������־Ŀ¼��
+      label: 必要的错误提示或脱敏诊断片段（可选）
+      description: 只提供定位所需的最小片段；截图请遮盖账号与个人信息。不要上传完整日志目录。
       render: text
   - type: checkboxes
     id: privacy
     attributes:
-      label: �ύǰ���
+      label: 提交前检查
       options:
-        - label: �����Ƴ�ƾ�ݡ���¼̬��������Ϣ����ʵ��Ƶ��תд���ģ���ȷ���ⲻ�ǹ�����¶��ȫ©����
+        - label: 我已移除凭据、登录态、个人信息、真实音频与转写正文，并确认这不是公开披露安全漏洞。
           required: true
