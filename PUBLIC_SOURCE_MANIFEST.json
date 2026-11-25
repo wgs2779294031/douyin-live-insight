@@ -32,6 +32,12 @@
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
+      "path": ".github/workflows/source-checks.yml",
+      "origin": "public_document_or_packaging_or_regenerated_manifest",
+      "bytes": 1485,
+      "sha256": "b18506b5a5bba9fc60c16ed40d7244ef5a2c8d64ab489274af9e798234c9b2ba"
+    },
+    {
       "path": ".gitignore",
       "bytes": 1825,
       "sha256": "28dcdb4f4d012114eee212ec29836e4d8866fb8ea36771dead4f1c85e9c53c77",
@@ -527,6 +533,12 @@
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
+      "path": "docs/CI.md",
+      "origin": "public_document_or_packaging_or_regenerated_manifest",
+      "bytes": 2088,
+      "sha256": "213ac5e66e9b87438b67dae7cb023ec3e47210e59ae94c7e05c2632e487fe153"
+    },
+    {
       "path": "docs/MAINTENANCE_POLICY.md",
       "bytes": 3800,
       "sha256": "703382c1a8b4e63d65a57a59b4158d387c491c0d863bc976642f5e0924379264",
@@ -726,8 +738,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 3552,
-      "sha256": "98a72f8e7c0fbb2a07dbb487a1f1aad95a18201f028223a6eb4940ce48240267",
+      "bytes": 3690,
+      "sha256": "9ba191144b9a2c9b8504529921886ef54a602bc56616071809a6585cc351038b",
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
