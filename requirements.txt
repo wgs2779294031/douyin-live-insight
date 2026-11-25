@@ -1,0 +1,11 @@
+websocket-client>=1.7.0
+requests>=2.31.0
+betterproto>=2.0.0b6
+# JS 签名引擎：跑 sign.js 计算 signature（X-Bogus）。Windows 有预编译 wheel，无需编译 V8、不依赖 Node。
+py-mini-racer>=0.6.0
+# 可选降级：mini_racer 装失败时 fallback 到 execjs，但需要系统装 Node.js 18+
+# PyExecJS>=1.5.1
+# LLM 层：火山方舟（豆包）OpenAI 兼容协议；仅 llm.enabled=true 时才真正调用
+openai>=1.40.0
+# 测试（dev 依赖，运行采集不需要）：pytest tests/ -v
+pytest>=7.0

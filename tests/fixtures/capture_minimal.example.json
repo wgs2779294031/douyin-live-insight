@@ -1,0 +1,8 @@
+[
+  {
+    "url": "https://example.invalid/webcast/feed/?aid=6383",
+    "status": 200,
+    "body": "{\"data\": [], \"status_code\": 0}",
+    "synthetic": true
+  }
+]

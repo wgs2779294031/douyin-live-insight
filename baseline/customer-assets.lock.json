@@ -1,0 +1,192 @@
+{
+  "ffmpeg": {
+    "input": "ffmpeg_zip",
+    "max_entries": 10000,
+    "max_uncompressed_bytes": 1073741824,
+    "version": "n9.0.2-57-gd838f9f9ae-20261116",
+    "zip_prefix": "ffmpeg-n9.0.2-57-gd838f9f9ae-win64-lgpl-9.0"
+  },
+  "inputs": {
+    "ffmpeg_build_mit": {
+      "bytes": 1064,
+      "cache_path": "notices/ffmpeg-build-fixed-LICENSE",
+      "sha256": "3a8df6889e4d5487b75f58326ef816df31ea49649d8f7146efda860b8167a964",
+      "url": "https://raw.githubusercontent.com/FFmpeg-Builds/FFmpeg-Builds/c9fe5114060e507409f7ee07edfd82efaf25d767/LICENSE"
+    },
+    "ffmpeg_build_readme": {
+      "bytes": 2777,
+      "cache_path": "notices/ffmpeg-build-fixed-README.md",
+      "sha256": "4f6f817fd57c5524e0d0832618e8f75d589093e2f05ef1ec2839af98e70e5053",
+      "url": "https://raw.githubusercontent.com/FFmpeg-Builds/FFmpeg-Builds/c9fe5114060e507409f7ee07edfd82efaf25d767/README.md"
+    },
+    "ffmpeg_build_recipes": {
+      "bytes": 263484,
+      "cache_path": "notices/ffmpeg-build-recipes-c9fe511.zip",
+      "sha256": "b38d523f629200404ce597b921e023567dea4ab8d4af5e8b933d96e76642472a",
+      "url": "https://github.com/FFmpeg-Builds/FFmpeg-Builds/archive/c9fe5114060e507409f7ee07edfd82efaf25d767.zip"
+    },
+    "ffmpeg_gplv3": {
+      "bytes": 35147,
+      "cache_path": "notices/ffmpeg-COPYING.GPLv3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/d838f9f9aeb0e09b4d068e2af20a46a12640696f/COPYING.GPLv3"
+    },
+    "ffmpeg_license": {
+      "bytes": 4346,
+      "cache_path": "notices/ffmpeg-source-LICENSE.md",
+      "sha256": "2e1d16c72fd74e12063776371da757322f8b77589386532f4fd8634bde7de1af",
+      "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/d838f9f9aeb0e09b4d068e2af20a46a12640696f/LICENSE.md"
+    },
+    "ffmpeg_zip": {
+      "bytes": 168520665,
+      "cache_path": "cache/ffmpeg-n9.0.2-57-gd838f9f9ae-win64-lgpl-9.0.zip",
+      "sha256": "c0499a84b984b695b85e03fa9e92c1449721ee4d185da727cbba91406ddb0e3f",
+      "url": "https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases/download/autobuild-2026-11-16-15-29/ffmpeg-n9.0.2-57-gd838f9f9ae-win64-lgpl-9.0.zip"
+    },
+    "model_config_json": {
+      "bytes": 2370,
+      "cache_path": "models/faster-whisper-small-536b066/config.json",
+      "sha256": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+      "url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/config.json"
+    },
+    "model_model_bin": {
+      "bytes": 483546902,
+      "cache_path": "models/faster-whisper-small-536b066/model.bin",
+      "sha256": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+      "url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/model.bin"
+    },
+    "model_readme": {
+      "bytes": 1998,
+      "cache_path": "notices/model-fixed-README.md",
+      "sha256": "329373481008c7c38654aff8ecdcf0163c211557cc7ba8e2ef6f2f84b4f75ec8",
+      "url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/README.md"
+    },
+    "model_tokenizer_json": {
+      "bytes": 2203239,
+      "cache_path": "models/faster-whisper-small-536b066/tokenizer.json",
+      "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+      "url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/tokenizer.json"
+    },
+    "model_vocabulary_txt": {
+      "bytes": 459861,
+      "cache_path": "models/faster-whisper-small-536b066/vocabulary.txt",
+      "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+      "url": "https://huggingface.co/Systran/faster-whisper-small/resolve/536b0662742c02347bc0e980a01041f333bce120/vocabulary.txt"
+    },
+    "node_zip": {
+      "bytes": 41166246,
+      "cache_path": "cache/node-v26.13.1-win-x64.zip",
+      "sha256": "e2edda75bfb089654705cf65a13b58933bfd5f57148e8ebda916f58a2474f1f7",
+      "url": "https://nodejs.org/dist/v26.13.1/node-v26.13.1-win-x64.zip"
+    },
+    "whisper_mit": {
+      "bytes": 1063,
+      "cache_path": "notices/openai-whisper-LICENSE-MIT",
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+      "url": "https://raw.githubusercontent.com/openai/whisper/86098128c0b4f24f0e2aa2994de830614b474227/LICENSE"
+    }
+  },
+  "kind": "offline_runtime_assets",
+  "model": {
+    "files": {
+      "config.json": "model_config_json",
+      "model.bin": "model_model_bin",
+      "tokenizer.json": "model_tokenizer_json",
+      "vocabulary.txt": "model_vocabulary_txt"
+    },
+    "revision": "536b0662742c02347bc0e980a01041f333bce120"
+  },
+  "node": {
+    "input": "node_zip",
+    "max_entries": 20000,
+    "max_uncompressed_bytes": 1073741824,
+    "version": "26.13.1",
+    "zip_prefix": "node-v26.13.1-win-x64"
+  },
+  "notices": [
+    {
+      "bytes": 1998,
+      "sha256": "329373481008c7c38654aff8ecdcf0163c211557cc7ba8e2ef6f2f84b4f75ec8",
+      "source": {
+        "input": "model_readme"
+      },
+      "target": "model-README.md"
+    },
+    {
+      "bytes": 1063,
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+      "source": {
+        "input": "whisper_mit"
+      },
+      "target": "openai-whisper-LICENSE-MIT"
+    },
+    {
+      "bytes": 2777,
+      "sha256": "4f6f817fd57c5524e0d0832618e8f75d589093e2f05ef1ec2839af98e70e5053",
+      "source": {
+        "input": "ffmpeg_build_readme"
+      },
+      "target": "ffmpeg-build-README.md"
+    },
+    {
+      "bytes": 1064,
+      "sha256": "3a8df6889e4d5487b75f58326ef816df31ea49649d8f7146efda860b8167a964",
+      "source": {
+        "input": "ffmpeg_build_mit"
+      },
+      "target": "ffmpeg-build-LICENSE-MIT"
+    },
+    {
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "source": {
+        "input": "ffmpeg_gplv3"
+      },
+      "target": "ffmpeg-COPYING.GPLv3"
+    },
+    {
+      "bytes": 4346,
+      "sha256": "2e1d16c72fd74e12063776371da757322f8b77589386532f4fd8634bde7de1af",
+      "source": {
+        "input": "ffmpeg_license"
+      },
+      "target": "ffmpeg-source-LICENSE.md"
+    },
+    {
+      "bytes": 263484,
+      "sha256": "b38d523f629200404ce597b921e023567dea4ab8d4af5e8b933d96e76642472a",
+      "source": {
+        "input": "ffmpeg_build_recipes"
+      },
+      "target": "ffmpeg-build-recipes-c9fe511.zip"
+    },
+    {
+      "bytes": 159309,
+      "sha256": "cbc91dba25c546898544155e1c0fce897f00e3f1df0afc795b8da891d38f92d9",
+      "source": {
+        "archive": "node",
+        "path": "LICENSE"
+      },
+      "target": "node-LICENSE"
+    },
+    {
+      "bytes": 42797,
+      "sha256": "fecd4ca8d62e4499d59b6e70dc81819698a107341ed6ef937e94f489459fbfde",
+      "source": {
+        "archive": "node",
+        "path": "README.md"
+      },
+      "target": "node-README.md"
+    },
+    {
+      "bytes": 7651,
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": {
+        "archive": "ffmpeg",
+        "path": "LICENSE.txt"
+      },
+      "target": "ffmpeg-LICENSE-LGPLv3.txt"
+    }
+  ],
+  "schema": 1
+}

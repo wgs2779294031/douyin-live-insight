@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.exe
+*.dll
+*.pdb
+*.zip
+*.partial
+bound-source/
+build-receipt.json
+*.verification.json

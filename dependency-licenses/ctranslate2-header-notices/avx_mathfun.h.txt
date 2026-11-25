@@ -1,0 +1,122 @@
+/*
+   AVX implementation of sin, cos, sincos, exp and log
+
+   Based on "sse_mathfun.h", by Julien Pommier
+   http://gruntthepeon.free.fr/ssemath/
+
+
+   License of the modified version (https://github.com/marian-nmt/marian-dev):
+
+   MIT License
+
+   Copyright (c) 2016 Marcin Junczys-Dowmunt, the University of Edinburgh, Adam
+   Mickiewicz University
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+
+   License of the orignal version (http://software-lisc.fbk.eu/avx_mathfun/):
+
+   Copyright (C) 2012 Giovanni Garberoglio
+   Interdisciplinary Laboratory for Computational Science (LISC)
+   Fondazione Bruno Kessler and University of Trento
+   via Sommarive, 18
+   I-38123 Trento (Italy)
+
+   This software is provided 'as-is', without any express or implied
+   warranty.  In no event will the authors be held liable for any damages
+   arising from the use of this software.
+
+   Permission is granted to anyone to use this software for any purpose,
+   including commercial applications, and to alter it and redistribute it
+   freely, subject to the following restrictions:
+
+   1. The origin of this software must not be misrepresented; you must not
+      claim that you wrote the original software. If you use this software
+      in a product, an acknowledgment in the product documentation would be
+      appreciated but is not required.
+   2. Altered source versions must be plainly marked as such, and must not be
+      misrepresented as being the original software.
+   3. This notice may not be removed or altered from any source distribution.
+*/
+
+#include <immintrin.h>
+#include <limits>
+
+/* yes I know, the top of this file is quite ugly */
+#ifdef _MSC_VER
+# define ALIGN32_BEG __declspec(align(32))
+# define ALIGN32_END 
+#else /* gcc or icc */
+# define ALIGN32_BEG
+# define ALIGN32_END __attribute__((aligned(32)))
+#endif
+
+/* __m128 is ugly to write */
+typedef __m256  v8sf; // vector of 8 float (avx)
+typedef __m256i v8si; // vector of 8 int   (avx)
+typedef __m128i v4si; // vector of 8 int   (avx)
+
+#define _PI32AVX_CONST(Name, Val)                                            \
+  static const ALIGN32_BEG int _pi32avx_##Name[4] ALIGN32_END = { Val, Val, Val, Val }
+
+_PI32AVX_CONST(1, 1);
+_PI32AVX_CONST(inv1, ~1);
+_PI32AVX_CONST(2, 2);
+_PI32AVX_CONST(4, 4);
+
+
+/* declare some AVX constants -- why can't I figure a better way to do that? */
+#define _PS256_CONST(Name, Val)                                            \
+  static const ALIGN32_BEG float _ps256_##Name[8] ALIGN32_END = { (float)Val, (float)Val, (float)Val, (float)Val, (float)Val, (float)Val, (float)Val, (float)Val }
+#define _PI32_CONST256(Name, Val)                                            \
+  static const ALIGN32_BEG int _pi32_256_##Name[8] ALIGN32_END = { Val, Val, Val, Val, Val, Val, Val, Val }
+#define _PS256_CONST_TYPE(Name, Type, Val)                                 \
+  static const ALIGN32_BEG Type _ps256_##Name[8] ALIGN32_END = { Val, Val, Val, Val, Val, Val, Val, Val }
+
+_PS256_CONST(1  , 1.0f);
+_PS256_CONST(0p5, 0.5f);
+/* the smallest non denormalized float number */
+_PS256_CONST_TYPE(min_norm_pos, int, 0x00800000);
+_PS256_CONST_TYPE(mant_mask, int, 0x7f800000);
+_PS256_CONST_TYPE(inv_mant_mask, int, ~0x7f800000);
+
+_PS256_CONST_TYPE(sign_mask, int, (int)0x80000000);
+_PS256_CONST_TYPE(inv_sign_mask, int, ~0x80000000);
+
+_PI32_CONST256(0, 0);
+_PI32_CONST256(1, 1);
+_PI32_CONST256(inv1, ~1);
+_PI32_CONST256(2, 2);
+_PI32_CONST256(4, 4);
+_PI32_CONST256(0x7f, 0x7f);
+
+_PS256_CONST(cephes_SQRTHF, 0.707106781186547524);
+_PS256_CONST(cephes_log_p0, 7.0376836292E-2);
+_PS256_CONST(cephes_log_p1, - 1.1514610310E-1);
+_PS256_CONST(cephes_log_p2, 1.1676998740E-1);
+_PS256_CONST(cephes_log_p3, - 1.2420140846E-1);
+_PS256_CONST(cephes_log_p4, + 1.4249322787E-1);
+_PS256_CONST(cephes_log_p5, - 1.6668057665E-1);
+_PS256_CONST(cephes_log_p6, + 2.0000714765E-1);
+_PS256_CONST(cephes_log_p7, - 2.4999993993E-1);
+_PS256_CONST(cephes_log_p8, + 3.3333331174E-1);
+_PS256_CONST(cephes_log_q1, -2.12194440e-4);
+_PS256_CONST(cephes_log_q2, 0.693359375);
+

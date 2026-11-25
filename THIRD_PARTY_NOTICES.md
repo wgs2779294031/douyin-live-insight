@@ -27,17 +27,18 @@
 
 安装发行物包含的 Python、Node.js、FFmpeg、语音模型及其他依赖应保留各自的完整许可和必要 notices。已检查的安装候选保留了 FFmpeg、Node.js、Whisper 相关材料、CPython 许可，以及 ONNX Runtime 的 `LICENSE` 和 `ThirdPartyNotices.txt`；这些组件不因本项目许可而改变自身许可。
 
-以下附件仍是发布准备中的明确待办，不能将本说明当成已经补齐的证明：
+本源码候选已补充以下完整许可正文和来源记录。精确文件列表、上游链接、来源哈希及必要的文本编码转换见 [许可清单](dependency-licenses/manifest.json)：
 
-| 组件 | 核对版本 | 需要补齐的材料 |
+| 组件 | 核对版本 | 已归档的材料 |
 | --- | --- | --- |
-| CTranslate2 | 4.9.0 | 对应版本的完整版权、许可及必要 notices |
-| FlatBuffers | 25.12.19 | 对应版本的完整版权、许可及必要 notices |
-| Tokenizers | 0.23.3 | 对应版本的完整版权、许可及必要 notices |
-| Vue | 3.5.44 | 完整 MIT 许可和版权说明；现有构建保留了许可横幅 |
-| Vue Router | 4.6.4 | 完整 MIT 许可和版权说明；现有构建保留了版权横幅 |
+| CTranslate2 | 4.9.0 | [版权与许可](dependency-licenses/ctranslate2-4.9.0/LICENSE)，另附已识别子模块、原生依赖和头文件 notices |
+| FlatBuffers | 25.12.19 | [完整许可](dependency-licenses/flatbuffers-25.12.19/LICENSE) |
+| Tokenizers | 0.23.3 | [完整许可](dependency-licenses/tokenizers-0.23.3/LICENSE) |
+| Vue | 3.5.44 | [完整 MIT 许可](dependency-licenses/vue-3.5.44/LICENSE)；现有构建保留了许可横幅 |
+| Vue Router | 4.6.4 | [完整 MIT 许可](dependency-licenses/vue-router-4.6.4/LICENSE)；现有构建保留了版权横幅 |
+| PyAV | 18.1.1 | [许可和作者说明](dependency-licenses/pyav-18.1.1/LICENSE.txt)，来自该版本官方 wheel |
 
-PyAV、NumPy 及其他原生依赖中捆绑的库，还需按实际发行文件核对来源、构建选项、完整 notices 和适用的源码或再链接要求。未列出的组件不因此视为无须履行许可义务。
+PyAV 候选锁已从上游撤回的18.1.0更新到18.1.1，并通过有限的 CPU 合成音频检查。已有 NumPy 和部分原生依赖 notices 也在许可目录中。文本归档和定向检查不等于最终二进制的完整再分发核验：仍应按实际发行文件核对捆绑库、构建选项、完整 notices 和适用的源码或再链接材料。未列出的组件不因此视为无须履行许可义务。
 
 ## 记录范围
 
