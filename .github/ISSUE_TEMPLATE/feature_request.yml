@@ -1,0 +1,34 @@
+name: ���ܽ���
+description: ����ʹ�ó�����ϣ�����������
+title: "[����] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        �¹��ܡ���ƽ̨�����������Ķ�����Ҫ��ȡ����Ŀ������ͬ����ʵʩ��
+        �ύ���鲻������Ŀ�ѳ�ŵʵ�ֻ�ȷ������ʱ�䡣�벻Ҫ����ƾ�ݻ���ʵ�ɼ����ϡ�
+  - type: textarea
+    id: problem
+    attributes:
+      label: ϣ�����ʲô���⣿
+      description: ˵��ʵ�ʳ�������Ӱ���ʹ���������Ƶ�ʡ�
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: ��ǰ��δ�����
+      description: ���й��ܻ������취Ϊʲô���㣿
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: �������Ϊ��ɽ��ܵ�ȡ��
+      description: �������������������д���룻��˵���Ƿ���Ҫ�������á�Ȩ�޻�ϵͳ֧�֡�
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: ���ƽ̨��汾����ѡ��

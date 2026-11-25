@@ -1,0 +1,58 @@
+name: ���ⷴ��
+description: ���氲װ���ɼ���תд����ѯ��ֹͣ�ָ��е�����
+title: "[����] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ���������������⡣Դ����Ͱ�װ���������ʱ������Դ��鵵��Ϊ�ɰ�װ���԰档
+        ��Ҫ�ϴ� Cookie����ά�롢��¼̬��API ��Կ��Webhook����������á���ʵ¼����תд���ġ�
+        ��ȫ©���밴 SECURITY.md ˽�±��棬���ڴ˹�������ϸ�ڡ�
+  - type: input
+    id: version
+    attributes:
+      label: �����汾�밲װ������
+      description: �뱣���������԰�汾�ţ���δʹ�ù������԰�ʱ����ȷ˵����
+      placeholder: ���磺�汾�š���װ���ļ���������δ��װ
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: ����ϵͳ����ػ���
+      description: Windows �汾��������ֱ����ص��������Ӳ����Ϣ������Ҫ�ṩ�豸���кš�
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: ���ֲ���
+      description: ��ʲô״̬��ʼ����ʲô˳��������Ƿ�ÿ�γ��֣�
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ԥ�ڽ��
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: ʵ�ʽ���뷢��ʱ��
+      description: ����ʵ�ʿ���������������ʵ���Ʋ⡣
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: ��Ҫ�Ĵ�����ʾ���������Ƭ�Σ���ѡ��
+      description: ֻ�ṩ��λ�������СƬ�Σ���ͼ���ڸ��˺��������Ϣ����Ҫ�ϴ�������־Ŀ¼��
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: �ύǰ���
+      options:
+        - label: �����Ƴ�ƾ�ݡ���¼̬��������Ϣ����ʵ��Ƶ��תд���ģ���ȷ���ⲻ�ǹ�����¶��ȫ©����
+          required: true
