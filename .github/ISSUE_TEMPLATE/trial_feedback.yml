@@ -11,7 +11,7 @@ body:
     id: version_environment
     attributes:
       label: 安装包版本与 Windows 版本
-      placeholder: "例如：v0.1.0-beta.1，Windows 11 x64"
+      placeholder: "例如：v0.1.0-beta.2，Windows 11 x64"
     validations:
       required: true
   - type: dropdown
@@ -36,4 +36,4 @@ body:
     id: followup
     attributes:
       label: 可选补充
-      description: 已使用多久、最希望改进什么；若出现登录或采集中断，可补异常时间、是否看到平台验证、是否收到飞书消息。原因不确定可写待排查。
+      description: 已使用多久、最希望改进什么；若出现登录或采集中断，可补异常时间、是否看到平台验证、测试通知是否收到、异常是否提醒、人工处理后是否收到恢复通知。原因不确定可写待排查。
