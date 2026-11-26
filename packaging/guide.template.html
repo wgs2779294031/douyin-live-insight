@@ -36,6 +36,7 @@ summary{cursor:pointer;font-weight:bold}#copy-status{min-height:26px;color:var(-
 <h1>直播监控本地版<br>安装与使用指南</h1>
 <p>第一次安装，按下方顺序操作即可。系统会在自己的电脑上保存采集数据，支持弹幕和统计、录音转写，以及把资料交给自己的智能体读取。</p>
 <p class="muted">本指南随当前测试版安装包生成；请同时核对发布页的完整 ZIP SHA-256。</p>
+<div class="note"><strong>长期运行需要人工值守。</strong>平台可能要求重新登录或完成验证。维护者约一到两周处理一次的经验不是固定周期；采集失败也可能来自网络或软件问题。建议连接飞书，但当前 Beta 仅覆盖部分采集事件，不能保证所有登录/验证受限均有提醒。开始长期运行前请阅读<a href="https://github.com/wgs2779294031/douyin-live-insight/blob/main/docs/OPERATING_BOUNDARIES.md" target="_blank" rel="noopener">运行边界、人工恢复与飞书通知指南</a>，并定期检查看板。</div>
 <nav aria-label="指南目录"><a href="#prepare">安装前准备</a><a href="#extract">解压</a><a href="#install">双击安装</a><a href="#first-run">打开看板和添加主播</a><a href="#daily">以后怎样开关</a><a href="#agent">智能体接入</a><a href="#help">遇到问题</a></nav>
 
 <h2 id="prepare">安装前准备</h2>
@@ -50,7 +51,7 @@ summary{cursor:pointer;font-weight:bold}#copy-status{min-height:26px;color:var(-
 
 <h2 id="extract">先完整解压</h2>
 <ol>
-<li>在电脑上接收并保存「直播监控本地版-含安装指南.zip」。</li>
+<li>从当前 GitHub 发布页下载并保存 Windows 测试版 ZIP。</li>
 <li>右键压缩包，选择「全部解压缩」或解压软件的「解压到」。选择一个短的本地路径，例如 <code>D:\LM-Setup</code>。只有 C 盘时可用 <code>C:\LM-Setup</code>，或自己的下载目录下的短路径。</li>
 <li>等待解压完成。打开解压后的目录，确认能同时看到这份指南、「安装直播监控.exe」和「安装文件」文件夹。</li>
 </ol>
