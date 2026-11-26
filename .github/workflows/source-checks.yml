@@ -46,3 +46,9 @@ jobs:
           RUN_DESKTOP_HARNESS: '0'
           PACKAGING_TEST_ROOT: ${{ runner.temp }}/douyin-live-insight-packaging-${{ github.run_id }}-${{ github.run_attempt }}
         run: python -B -m unittest discover -s packaging/tests -p test_packaging.py -v
+      - name: Run synthetic notification and HTTP guard tests
+        env:
+          DLI_NOTIFICATION_TEST_ROOT: ${{ runner.temp }}
+        run: python -B -m unittest discover -s scripts/notification_tests -v
+      - name: Run synthetic sustained-monitoring alert tests
+        run: python -B -m unittest discover -s tests -p test_monitoring_alerts_synthetic.py -v

@@ -226,7 +226,8 @@ async function jsonFetch(url, options) {
   if (!r.ok) {
     const body = await r.json().catch(() => ({}))
     const modelSettings = ['/api/llm/settings', '/api/llm/key/delete', '/api/llm/test'].includes(url)
-    const error = new Error(modelSettings ? '模型配置请求失败（' + r.status + '）'
+    const sensitiveSettings = modelSettings || url === '/api/notifications/feishu'
+    const error = new Error(sensitiveSettings ? (modelSettings ? '模型配置请求失败（' : '通知配置请求失败（') + r.status + '）'
       : (body.error || '请求失败（' + r.status + '）'))
     error.status = r.status
     // Configuration forms need partial-save state, never an echoed request or key.
@@ -372,6 +373,17 @@ export function usageDisplay(summary) {
 }
 
 export const api = {
+  feishuNotifications: () => jsonFetch('/api/notifications/feishu'),
+  feishuNotificationAction: async (body) => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 25000)
+    try {
+      return await jsonFetch('/api/notifications/feishu', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), signal: controller.signal
+      })
+    } finally { clearTimeout(timer) }
+  },
   asrStatus: (options = {}) => asrFetch(options),
   asrRetry: (options = {}) => asrFetch({ ...options, method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'retry' }) }),

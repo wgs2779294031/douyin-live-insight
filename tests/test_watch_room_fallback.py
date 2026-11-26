@@ -53,6 +53,7 @@ def full(status=2, owner=SEC, ident="1912345678987654321"):
 ])
 def test_room_enter_checks_real_js_then_watcher_state(monkeypatch, tmp_path, response, http_ok, reason):
     monkeypatch.setattr(watch, "ROOT", tmp_path)
+    monkeypatch.setattr(watch, "DATA", tmp_path / "data")
     cache(tmp_path, [{"label":TAG, "room_id":RID}])
     def broken(*args):
         raise RuntimeError("https://sensitive.invalid/private-url")
@@ -80,6 +81,7 @@ def test_primary_wins_for_both_confirmed_states(monkeypatch):
 
 def test_no_unique_cached_label_or_non_numeric_room_is_unknown(monkeypatch, tmp_path):
     monkeypatch.setattr(watch,"ROOT",tmp_path)
+    monkeypatch.setattr(watch,"DATA",tmp_path / "data")
     monkeypatch.setattr(watch,"poll_once",lambda *a: {"is_live":False,"live_status":0,"api_code":403})
     monkeypatch.setattr(watch,"cdp_eval",lambda *a: pytest.fail("no usable cache"))
     for rooms in (None, [], [{"label":"其他","room_id":RID}], [{"label":TAG,"room_id":"https://invalid"}],
@@ -92,6 +94,7 @@ def test_no_unique_cached_label_or_non_numeric_room_is_unknown(monkeypatch, tmp_
 
 def test_cdp_failure_remains_unknown(monkeypatch, tmp_path):
     monkeypatch.setattr(watch,"ROOT",tmp_path)
+    monkeypatch.setattr(watch,"DATA",tmp_path / "data")
     cache(tmp_path,[{"label":TAG,"room_id":RID}])
     monkeypatch.setattr(watch,"poll_once",lambda *a: {"is_live":False,"api_msg":"blocked"})
     def failed(*args):

@@ -7,6 +7,8 @@
 - `scripts/check_public_source.py`：检查 Git 跟踪文件的公开路径、文本编码、Python 语法和 JSON 格式，不导入应用模块。
 - `scripts/local_data/tests`：运行7项标准库合成回归，检查资料投影、日期窗口、脱敏、索引及失败时保留原输出。
 - `packaging/tests/test_packaging.py`：运行标准库合成 ZIP 回归，检查正式清单的四字段、组件角色与路径、摘要、目录及输出保护。显式设置 `RUN_DESKTOP_HARNESS=0`，跳过可选的原生编译与桌面 harness；临时文件只写入本轮运行器临时目录。
+- `scripts/notification_tests`：检查飞书通知配置保密、旧配置兼容、明确停用、签名与替身发送结果，以及真实本机 HTTP 的会话、同源、写入凭证和请求大小门禁；不会向飞书发送消息。
+- `tests/test_monitoring_alerts_synthetic.py`：使用虚拟时钟、合成资料和替身发送器检查持续未知阈值、业务证据、去重、失败重试、恢复和停止竞态，不访问平台。
 
 工作流不安装应用依赖，不运行模型、真实采集、平台登录、安装器或发布任务。它没有 `pull_request_target` 触发器，外部 PR 仍受 GitHub 对首次贡献者和工作流执行的审批规则约束。
 
