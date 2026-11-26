@@ -1,0 +1,39 @@
+name: 公测试用体验
+description: 安装成功、没有装好或暂时没有发现问题，都欢迎简短反馈。
+title: "[试用反馈] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢试用！先读[运行边界与飞书通知范围](https://github.com/wgs2779294031/douyin-live-insight/blob/main/docs/OPERATING_BOUNDARIES.md)。
+        请不要上传 Cookie、二维码、登录态、密钥、Webhook、完整配置、真实录音或转写正文。
+  - type: input
+    id: version_environment
+    attributes:
+      label: 安装包版本与 Windows 版本
+      placeholder: "例如：v0.1.0-beta.1，Windows 11 x64"
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: 这次试到哪一步
+      options:
+        - 尚未安装或安装未成功
+        - 已装好并打开看板
+        - 已添加主播并产生采集或转写资料
+        - 已连续运行一段时间
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: 一句话体验或遇到的问题
+      description: 哪一步最费劲、资料是否有用，或暂时没有发现问题；若能复现，请补操作步骤。
+    validations:
+      required: true
+  - type: textarea
+    id: followup
+    attributes:
+      label: 可选补充
+      description: 已使用多久、最希望改进什么；若出现登录或采集中断，可补异常时间、是否看到平台验证、是否收到飞书消息。原因不确定可写待排查。
