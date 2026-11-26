@@ -40,8 +40,8 @@ def _token_responder(captured_body=None):
         def __init__(self, body):
             self._b = body
 
-        def read(self):
-            return self._b
+        def read(self, size=-1):
+            return self._b if size < 0 else self._b[:size]
 
     def responder(req):
         if "tenant_access_token" in req.full_url:

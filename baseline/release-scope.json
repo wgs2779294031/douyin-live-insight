@@ -94,6 +94,8 @@
     "scripts/material_common.py",
     "scripts/material_facts.py",
     "scripts/material_query.py",
+    "scripts/monitoring_alerts.py",
+    "scripts/notification_settings.py",
     "scripts/notify.py",
     "scripts/pb_decode.py",
     "scripts/portrait_backfill.py",
@@ -119,8 +121,8 @@
     "sources/bilibili_web.py",
     "sources/douyin_reverse.py",
     "storage.py",
-    "web/dist/assets/index-4ZVgLCtl.js",
-    "web/dist/assets/index-BGpUt2ip.css",
+    "web/dist/assets/index--xS9kJ1B.js",
+    "web/dist/assets/index-BJFIFmsb.css",
     "web/dist/index.html",
     "webmssdk.js"
   ],
@@ -418,5 +420,6 @@
   ],
   "shipping_blockers": [
     "A public binary must have traceable source/assets, appropriate targeted validation, accurate untested-scope notes, and the required third-party redistribution materials; no new binary is provided by this source candidate."
-  ]
+  ],
+  "public_beta_version": "v0.1.0-beta.2"
 }

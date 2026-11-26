@@ -553,8 +553,8 @@
     },
     {
       "path": "scripts/local_app.py",
-      "bytes": 56584,
-      "sha256": "90095ae4c3a1c305708a7ed42f65b60715626421807cb0370c093d6f6b91aae9"
+      "bytes": 57670,
+      "sha256": "4d55002c70685f4cb12285d482831dd339f4e4863941202940315ecc0c22f1eb"
     },
     {
       "path": "scripts/local_asr.py",
@@ -652,9 +652,19 @@
       "sha256": "4da53fbfc95e1f242aa9e3e9da40ab08460b1eefea61d929e1330729de7d25d8"
     },
     {
+      "path": "scripts/monitoring_alerts.py",
+      "bytes": 12359,
+      "sha256": "59e3f329c4ff84d0062b8af8336a5b2b6f8580b1228d8249dce8ba7d022ce329"
+    },
+    {
+      "path": "scripts/notification_settings.py",
+      "bytes": 11882,
+      "sha256": "37bd064142352b62dd6bc7e0307c46532f49063983f816d0bca9bed003225cbb"
+    },
+    {
       "path": "scripts/notify.py",
-      "bytes": 7147,
-      "sha256": "d2b67dc520078032ac87cd0786207f7102c50caee4b7c114554278d3a68fadb4"
+      "bytes": 8645,
+      "sha256": "7fa2a2f924066d5118dc53e675a40fa43fb2f2eca8a09b5909d7ffecc84b7a32"
     },
     {
       "path": "scripts/portrait_backfill.py",
@@ -703,8 +713,8 @@
     },
     {
       "path": "scripts/watch_anchor_live.py",
-      "bytes": 38182,
-      "sha256": "37681d88038558a5f61b4c03bcf7ae06dcf674a8e02189a725ddc5f3083f6989"
+      "bytes": 42168,
+      "sha256": "7bb77d8b6d1b4e13d16aa52e159beae6df1d3997a13e5fc93bdf3705b60ac1b8"
     },
     {
       "path": "scripts/windows_job.py",
@@ -752,19 +762,19 @@
       "sha256": "d717c8f4af85b8a86052e27a87d15a6435181c6a74223b53dee133efcf3401aa"
     },
     {
-      "path": "web/dist/assets/index-4ZVgLCtl.js",
-      "bytes": 257437,
-      "sha256": "6e9eacfa597f894a1f8828fa6e0d0f52a28dd481cfd450752b2b36295206e2d4"
+      "path": "web/dist/assets/index--xS9kJ1B.js",
+      "bytes": 269597,
+      "sha256": "56d763b7d94e1b65cba96f2901c2663aa3374f1fe0804d2e33aee99e24e69380"
     },
     {
-      "path": "web/dist/assets/index-BGpUt2ip.css",
-      "bytes": 17121,
-      "sha256": "b1742efa8b913b61deb421c2d7f9a6ac6e6d3c2f8c4d4bd031f71a080d103673"
+      "path": "web/dist/assets/index-BJFIFmsb.css",
+      "bytes": 18425,
+      "sha256": "67737b1558b2c9346013546b71a20e1a1c693f5c6bec9bf8f8dd8d215a670806"
     },
     {
       "path": "web/dist/index.html",
       "bytes": 667,
-      "sha256": "b303ac9e683b7bdc9151667643b0d5c1992c897bae8bac6352f0c5d5b8dda08f"
+      "sha256": "c20873378765910df376eed65efe91f2257cc70adde3b4f7f9a3e7f27c408bf7"
     },
     {
       "path": "webmssdk.js",
@@ -772,7 +782,7 @@
       "sha256": "8f32a3a607b6f93c28cb95eec2b32c2187cd3b7212870affd78c500b1f023e57"
     }
   ],
-  "rule": "Public source candidate: reviewed program inputs plus exact third-party license resources; no new binary acceptance is implied.",
+  "rule": "Explicit entries plus conservative static local imports and named dynamic resources; builder never copies the worktree or Git history.",
   "state_not_program": [
     "config.json",
     "anchors.json",
@@ -788,8 +798,6 @@
     "scripts/customer_upgrade_gate.py"
   ],
   "unsupported_legacy_cli_not_shipped": [
-    "anchor_profiles/.gitkeep",
-    "anchors.json",
     "daily_report.py",
     "requirements-mcp.txt",
     "requirements.txt",

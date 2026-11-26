@@ -18,7 +18,8 @@
    所以必须从 `room_data.owner.web_rid` 拿。
 2. **接口带 `a_bogus` 签名，纯 requests 会被风控**（`status_msg=blocked`）。
    本仓 `a_bogus.js` 生成的签名实测**过不了**（可能缺 webid/verifyFp 等环境绑定）。
-   → **走已登录浏览器通道**（CDP + 页面内 fetch，同源自带 cookie/签名），零风控、零账号动作。
+   → **走已登录浏览器通道**（CDP + 页面内 fetch，同源自带 cookie/签名）。
+   平台仍可能要求人工登录或验证，不能保证持续可用。
 
 用法
 ----
@@ -60,6 +61,9 @@ bootstrap_entry()
 from file_lock import file_lock  # noqa: E402
 from scripts.local_context import (activate_customer_environment, browser_owner_valid,
     customer_stop_requested, load_customer_context)
+from scripts.monitoring_alerts import (MonitoringAlertState, deliver_event,
+    business_filename_unique, latest_business_timestamp, target_watch_enabled)
+from config import RoomConfig
 
 CUSTOMER = load_customer_context()
 activate_customer_environment(CUSTOMER)
@@ -363,6 +367,61 @@ def _announce_assist(streak: int) -> None:
           % (streak, ASSIST_RETRY_SECONDS))
 
 
+def _customer_monitoring_step(state, tag, rec, kind, *, sec_uid, file_tag=None,
+                              now=None, wall_now=None):
+    """Observe one installed-role sample without changing collection decisions."""
+    if not CUSTOMER:
+        return None
+    if customer_stop_requested(CUSTOMER, allow_parent=True):
+        state.retire()
+        return state.snapshot()
+    enabled = target_watch_enabled(CUSTOMER["roster"], tag, sec_uid)
+    if enabled is None:
+        state.pause()
+        return state.snapshot()
+    now = time.monotonic() if now is None else now
+    wall_now = time.time() if wall_now is None else wall_now
+    probe = "unknown"
+    if kind is None and rec.get("api_code") in (None, 0):
+        if rec.get("is_live") is True and rec.get("web_rid"):
+            probe = "live"
+        elif is_confirmed_offline(rec, kind):
+            probe = "offline"
+    event = state.observe(now=now, wall_now=wall_now, probe=probe,
+        probe_ts=rec.get("ts"), active=enabled,
+        business_ts=latest_business_timestamp(DATA, tag, wall_now, file_tag=file_tag)
+        if enabled and business_filename_unique(CUSTOMER["roster"], tag, file_tag) else None)
+    if event is not None:
+        # A target can be stopped or disabled while a slow browser query runs.
+        if customer_stop_requested(CUSTOMER, allow_parent=True):
+            state.retire()
+        else:
+            current = target_watch_enabled(CUSTOMER["roster"], tag, sec_uid)
+            if current is False:
+                state.retire()
+            elif current is None:
+                state.pause()
+            else:
+                def permitted():
+                    return (not customer_stop_requested(CUSTOMER, allow_parent=True, strict=True)
+                            and target_watch_enabled(CUSTOMER["roster"], tag, sec_uid) is True)
+                delivered = deliver_event(state, event, tag, now, _notify, permitted=permitted)
+                if delivered:
+                    print("[通知] 持续异常%s已发送。" % (
+                        "恢复" if event.action == "recovery" else "提醒"))
+                else:
+                    if customer_stop_requested(CUSTOMER, allow_parent=True):
+                        state.retire()
+                    else:
+                        current = target_watch_enabled(CUSTOMER["roster"], tag, sec_uid)
+                        if current is False:
+                            state.retire()
+                        elif current is None:
+                            state.pause()
+                    print("[通知] 持续异常通知未送达；仅在目标仍启用时按限频重试。")
+    return state.snapshot()
+
+
 HEAL_COOLDOWN_SECONDS = 90.0   # 通道自愈的最小间隔（多实例并发也各自限频，防反复导航）
 
 
@@ -555,6 +614,7 @@ def main() -> int:
     collector_restarts = 0    # 本场累计重启次数（跑够 COLLECTOR_HEALTHY_SECONDS 才清零）
     collector_fast_exits = 0  # 连续「刚起就死」次数，用于熔断防打爆
     collector_paused_until = 0.0  # 熔断冷却截止时刻（过了自动再试）
+    collector_file_tag = None
 
     print("[监控] 目标 sec_uid=%s 间隔=%.0fs 自动采集=%s 状态文件=%s"
           % (args.sec_uid, args.interval, args.start, out_path))
@@ -564,6 +624,7 @@ def main() -> int:
     assist_kind: Optional[str] = None
     announced = False
     last_heal = 0.0
+    monitoring_alert = MonitoringAlertState(time.monotonic()) if CUSTOMER else None
     try:
         while True:
             if CUSTOMER and customer_stop_requested(CUSTOMER, allow_parent=True):
@@ -579,8 +640,20 @@ def main() -> int:
                 rec = {"ts": int(time.time()), "time": time.strftime("%Y-%m-%d %H:%M:%S"),
                        "error": str(e), "is_live": False}
 
-            # 状态变更随原探测行落盘，远程探测告警由 Health 统一汇总。
+            if CUSTOMER and customer_stop_requested(CUSTOMER, allow_parent=True):
+                break
+            # The installed watcher owns sustained-unknown notifications; its
+            # legacy external Health probe is not installed or scheduled here.
             kind = classify_env_failure(rec)
+            if monitoring_alert is not None:
+                try:
+                    rec["monitoring_alert"] = _customer_monitoring_step(
+                        monitoring_alert, tag, rec, kind, sec_uid=args.sec_uid,
+                        file_tag=collector_file_tag)
+                except Exception:
+                    # Notification diagnostics never turn an unknown probe into
+                    # offline, stop a collector, or expose an upstream exception.
+                    rec["monitoring_alert"] = {"status": "check_unavailable"}
             if kind is None:
                 if announced:
                     rec["probe_transition"] = "confirmed_again"
@@ -644,6 +717,7 @@ def main() -> int:
                         print("[监控] 已生成配置：%s" % cfg_path)
                         was_restart = proc is not None
                         proc = start_collector(cfg_path, args.llm)
+                        collector_file_tag = RoomConfig(room_id=web_rid, label=tag).file_tag()
                         collector_started_at = time.time()
                         # 首次开播才发「★开播」；重生已经在上面发过「采集中断」
                         if not was_restart and resume_room and resume_room == rec.get("room_id_str"):
@@ -696,6 +770,8 @@ def main() -> int:
     except KeyboardInterrupt:
         print("\n[监控] Ctrl+C，退出。")
     finally:
+        if monitoring_alert is not None:
+            monitoring_alert.retire()
         if proc is not None:
             print("[监控] 终止采集进程 pid=%s" % proc.pid)
             if CUSTOMER and customer_stop_requested(CUSTOMER, allow_parent=True):

@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { api, useBoard, usageDisplay } from '../store'
 import BrowserLoginGuide from '../components/BrowserLoginGuide.vue'
 import AsrStatusCard from '../components/AsrStatusCard.vue'
+import FeishuNotifications from '../components/FeishuNotifications.vue'
 
 const board = useBoard()
 const llm = ref(null)
@@ -494,6 +495,7 @@ onMounted(async () => {
       </div>
       <BrowserLoginGuide />
       <AsrStatusCard />
+      <FeishuNotifications />
     </div>
 
     <div class="card">

@@ -646,6 +646,7 @@ def create_board(context, manager, owner):
     from backfill_tasks import TaskStore
     from local_access import LocalAccess
     from scripts.local_material_api import MaterialAPI, MAX_BODY_BYTES
+    from scripts.notification_settings import NotificationSettingsAPI
     anchor_roster.ROSTER_PATH = Path(context["roster"])
     anchor_manager.DATA, anchor_manager.ROOT = Path(context["data"]), Path(context["root"])
     anchor_manager.PY = Path(context["python"])
@@ -657,6 +658,7 @@ def create_board(context, manager, owner):
     store = LocalStore(context["data"], roster_path=context["roster"])
     access = LocalAccess(context["instance_id"] + ":" + str(context["port"]))
     materials = MaterialAPI(context, stopping=lambda: manager.stopping)
+    notifications = NotificationSettingsAPI(context["config"], stopping=lambda: manager.stopping)
     broadcaster = board.broadcast.Broadcaster(store.snapshot, interval=board.SSE_INTERVAL,
         ping_every=board.PING_EVERY, feed_fn=store.take_new_danmu)
 
@@ -735,6 +737,13 @@ def create_board(context, manager, owner):
                 if self.command == "POST":
                     return self._mutation(self._browser_login)
                 return self._reject_json(405, {"error": "不支持此登录辅助操作。"})
+            if path == "/api/notifications/feishu":
+                if self.command == "GET":
+                    code, body = notifications.get()
+                    return self._json(code, body)
+                if self.command == "POST":
+                    return self._mutation(self._notifications)
+                return self._reject_json(405, {"code": "invalid_request", "error": "不支持此通知操作。"})
             if path == "/api/asr":
                 if self.command == "GET":
                     return self._asr_status()
@@ -764,6 +773,16 @@ def create_board(context, manager, owner):
             except board.RequestBodyError as error:
                 return self._reject_json(error.code, error_body("invalid_refresh_request"))
             code, body = materials.post(query, raw)
+            return self._json(code, body)
+
+        def _notifications(self):
+            try:
+                if self._declared_length() > 16384:
+                    return self._reject_json(413, {"ok": False, "code": "invalid_request", "delivered": False})
+                body = self._read_json()
+            except board.RequestBodyError:
+                return self._reject_json(400, {"ok": False, "code": "invalid_request", "delivered": False})
+            code, body = notifications.post(body)
             return self._json(code, body)
 
         def _asr_status(self):
