@@ -28,8 +28,8 @@
     {
       "path": ".github/ISSUE_TEMPLATE/trial_feedback.yml",
       "origin": "public_document_or_packaging_or_regenerated_manifest",
-      "bytes": 1545,
-      "sha256": "d6e50b3cde2fcc7d0067e275caec5c2a115fae4304590eb53458157037541a2b"
+      "bytes": 1608,
+      "sha256": "3889bbde8cfb762183aa9f47412d225ec5be96dc8a3983ca7bb1f250e4e3e504"
     },
     {
       "path": ".github/PULL_REQUEST_TEMPLATE.md",
@@ -546,8 +546,8 @@
     },
     {
       "path": "docs/MAINTENANCE_POLICY.md",
-      "bytes": 3800,
-      "sha256": "703382c1a8b4e63d65a57a59b4158d387c491c0d863bc976642f5e0924379264",
+      "bytes": 3983,
+      "sha256": "afac3b06e3957ce22ededde3f53ee2168800b667630f17d6c532334c1739da4d",
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
@@ -750,8 +750,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 5291,
-      "sha256": "019421512be10a1324fee1d051bd8ed306e83a2f1aab82af6ae85be49ff74484",
+      "bytes": 5244,
+      "sha256": "0918405fe83a79986d8f9daca766096feffa96ca09f4e0618eec5f50b989963a",
       "origin": "public_document_or_packaging_or_regenerated_manifest"
     },
     {
